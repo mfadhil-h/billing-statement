@@ -1,0 +1,4 @@
+@formula: hasil1 = hargabarang * jumlahbarang@ 
+@formula: hasil2 = SUM(hasil1)@
+@formula: hasil3 = hasil2 * 10%@
+@formula: hasil4 = hasil3 + biayaadmin@

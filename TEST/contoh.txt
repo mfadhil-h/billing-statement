@@ -1,0 +1,48 @@
+@formula: hasil1 = hargabarang * jumlahbarang@ 
+@formula: hasil2 = SUM(hasil1)@
+@formula: hasil3 = hasil2 * 10%@
+@formula: hasil4 = hasil3 + biayaadmin@
+
+=====
+
+@formula: hasil1 = hargabarang * jumlahbarang@ 
+@formula: hasil2 = hasil1 + 1000@
+@formula: hasil3 = hasil2 * 4@
+@formula: hasil4 = hasil3 * 10 / 100@
+
+=====
+
+@formula: hasil1 = hargabarang * jumlahbarang@ 
+@formula: hasil2 = SUM(hasil1)@
+@formula: hasil3 = AVG(hasil1)@
+@formula: hasil4 = COUNT(hasil1)@
+@formula: hasil5 = MAX(hasil1)@
+@formula: hasil6 = MIN(hasil1)@
+
+
+@formula: hasil1 = pertama + kedua + ketiga@
+
+
+@string: nama@
+@string: cabang@
+@string: barang@
+@formula: total = jumlah * harga@
+@formula: fee  = total * 10 / 100@
+@formula: totalpenjualan = SUM(total)@
+@formula: totalfee = SUM(fee)@
+@outputheader: nama, cabang, barang, jumlah, harga, total, fee@
+@outputdatagroup: nama asc, cabang asc, barang asc@
+@outputrecapgroup: totalpenjualan@
+@outputrecapgroup: totalfee@
+
+
+
+
+
+
+
+
+
+
+
+
