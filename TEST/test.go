@@ -685,9 +685,12 @@ func processForNonString(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 	isFunction, incResult := checkFunction(db, incFormula, incProcessID)
 	if !isFunction {
 		expression, _ := govaluate.NewEvaluableExpression(incFormula)
-		fmt.Println(expression)
+		println(fmt.Sprintf("expression: %+v", expression))
+		//fmt.Println(expression)
+		println(fmt.Sprintf("rawResult: %+v", mapData))
 		rawResult, err := expression.Evaluate(mapData)
 		incResult = fmt.Sprintf("%v", rawResult)
+		println(fmt.Sprintf("rawResult: %+v", rawResult))
 
 		if err == nil {
 			updateDatabase(db, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)

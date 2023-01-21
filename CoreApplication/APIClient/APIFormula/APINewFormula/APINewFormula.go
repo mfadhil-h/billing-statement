@@ -38,6 +38,39 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 	incField19 := modules.GetStringFromMapInterface(mapIncoming, "par19")
 	incField20 := modules.GetStringFromMapInterface(mapIncoming, "par20")
 
+	incField21 := modules.GetStringFromMapInterface(mapIncoming, "par21")
+	incField22 := modules.GetStringFromMapInterface(mapIncoming, "par22")
+	incField23 := modules.GetStringFromMapInterface(mapIncoming, "par23")
+	incField24 := modules.GetStringFromMapInterface(mapIncoming, "par24")
+	incField25 := modules.GetStringFromMapInterface(mapIncoming, "par25")
+	incField26 := modules.GetStringFromMapInterface(mapIncoming, "par26")
+	incField27 := modules.GetStringFromMapInterface(mapIncoming, "par27")
+	incField28 := modules.GetStringFromMapInterface(mapIncoming, "par28")
+	incField29 := modules.GetStringFromMapInterface(mapIncoming, "par29")
+	incField30 := modules.GetStringFromMapInterface(mapIncoming, "par30")
+
+	incField31 := modules.GetStringFromMapInterface(mapIncoming, "par31")
+	incField32 := modules.GetStringFromMapInterface(mapIncoming, "par32")
+	incField33 := modules.GetStringFromMapInterface(mapIncoming, "par33")
+	incField34 := modules.GetStringFromMapInterface(mapIncoming, "par34")
+	incField35 := modules.GetStringFromMapInterface(mapIncoming, "par35")
+	incField36 := modules.GetStringFromMapInterface(mapIncoming, "par36")
+	incField37 := modules.GetStringFromMapInterface(mapIncoming, "par37")
+	incField38 := modules.GetStringFromMapInterface(mapIncoming, "par38")
+	incField39 := modules.GetStringFromMapInterface(mapIncoming, "par39")
+	incField40 := modules.GetStringFromMapInterface(mapIncoming, "par40")
+
+	incField41 := modules.GetStringFromMapInterface(mapIncoming, "par41")
+	incField42 := modules.GetStringFromMapInterface(mapIncoming, "par42")
+	incField43 := modules.GetStringFromMapInterface(mapIncoming, "par43")
+	incField44 := modules.GetStringFromMapInterface(mapIncoming, "par44")
+	incField45 := modules.GetStringFromMapInterface(mapIncoming, "par45")
+	incField46 := modules.GetStringFromMapInterface(mapIncoming, "par46")
+	incField47 := modules.GetStringFromMapInterface(mapIncoming, "par47")
+	incField48 := modules.GetStringFromMapInterface(mapIncoming, "par48")
+	incField49 := modules.GetStringFromMapInterface(mapIncoming, "par49")
+	incField50 := modules.GetStringFromMapInterface(mapIncoming, "par50")
+
 	incFormula := modules.GetStringFromMapInterface(mapIncoming, "formula")
 	incFormulaName := modules.GetStringFromMapInterface(mapIncoming, "name")
 	incType := modules.GetStringFromMapInterface(mapIncoming, "type")
@@ -49,11 +82,13 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 		incTime = "00:00"
 	}
 
-	query := "INSERT INTO formula (formula_id, client_id, formula_name, " +
+	query := "INSERT INTO yformula (formula_id, client_id, formula_name, " +
 		"field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, " +
 		"field11, field12, field13, field14, field15, field16, field17, field18, field19, field20," +
 		"formula, formula_type, formula_time, formula_create_datetime, is_active) " +
-		"VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28)"
+		"VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27," +
+		"$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54," +
+		"$55,$56,$57,$58)"
 
 	result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName,
 		incField1, incField2, incField3, incField4, incField5, incField6, incField7, incField8, incField9, incField10,
@@ -79,7 +114,6 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 	return isSuccess, incFormulaID
 }
 
-
 func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
 
@@ -97,7 +131,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 	modules.DoLog("INFO", incTraceCode, "API", "Auth",
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
-	if len(mapIncoming) > 0  {
+	if len(mapIncoming) > 0 {
 
 		modules.DoLog("INFO", incTraceCode, "API", "Auth",
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
@@ -147,4 +181,3 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 	return incTraceCode, responseHeader, responseContent
 }
-

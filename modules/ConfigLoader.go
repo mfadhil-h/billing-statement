@@ -6,16 +6,16 @@ func LoadConfig() map[string]string {
 	// Local
 	mapConfig["databaseHost"] = "localhost"
 	mapConfig["databasePort"] = "5432"
-	mapConfig["databaseName"] = "theformula"
+	mapConfig["databaseName"] = "billing_fromula"
 	//mapConfig["databaseName"] = "pcubilling"
 	mapConfig["databaseUser"] = "postgres"
-	mapConfig["databasePass"] = "123456"
+	mapConfig["databasePass"] = "postgres"
 
 	mapConfig["redisHost"] = "localhost"
 	mapConfig["redisPort"] = "6379"
-	mapConfig["redisDB"] = "10"
+	mapConfig["redisDB"] = "3"
 	mapConfig["redisUser"] = ""
-	mapConfig["redisPass"] = "123456"
+	mapConfig["redisPass"] = "ading"
 
 	mapConfig["rabbitHost"] = "localhost"
 	mapConfig["rabbitPort"] = "5672"
@@ -57,4 +57,3 @@ func LoadConfigProduction() map[string]string {
 
 	return mapConfig
 }
-
