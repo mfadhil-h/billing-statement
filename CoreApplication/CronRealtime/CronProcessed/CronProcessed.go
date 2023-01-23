@@ -90,7 +90,7 @@ func getResult(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode st
 	return isSuccess, incDataID
 }
 
-func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incTransactionID string, incClientID string, incFormulaID string, incFormula string) {
+func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incClientID string, incFormulaID string, redisKey string) {
 
 	var mapData = make(map[string]interface{})
 	incDataID := ""
@@ -115,7 +115,7 @@ func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 				strClientID := modules.ConvertSQLNullStringToString(rawClientID)
 				strFormulaID := modules.ConvertSQLNullStringToString(rawFormulaID)
 
-				redisKey := "test_" + strFormulaID
+				//redisKey := "test_" + strFormulaID
 				redisVal, _ := modules.RedisGet(rc, cx, redisKey)
 				mapRedis := modules.ConvertJSONStringToMap("", redisVal)
 
@@ -192,14 +192,14 @@ func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 func processSavetoAnotherDB(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incDataID string) (bool, string) {
 
-	query := "INSERT INTO ytransaction " +
-		"SELECT data_id, client_id, formula_id, process_id, " +
-		"f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, " +
-		"f11, f12, f13, f14, f15, f16, f17, f18, f19, f20," +
-		"f21, f22, f23, f24, f25, f26, f27, f28, f29, f30," +
-		"f31, f32, f33, f34, f35, f36, f37, f38, f39, f40," +
-		"f41, f42, f43, f44, f45, f46, f47, f48, f49, f50 " +
-		"FROM ydata WHERE data_id = $1"
+	query := `INSERT INTO ytransaction 
+		SELECT data_id, client_id, formula_id, process_id, 
+		f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, 
+		f11, f12, f13, f14, f15, f16, f17, f18, f19, f20,
+		f21, f22, f23, f24, f25, f26, f27, f28, f29, f30,
+		f31, f32, f33, f34, f35, f36, f37, f38, f39, f40,
+		f41, f42, f43, f44, f45, f46, f47, f48, f49, f50 
+		FROM ydata WHERE data_id = $1`
 
 	result, err := db.Exec(query, incDataID)
 

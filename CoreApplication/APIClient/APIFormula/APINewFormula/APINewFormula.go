@@ -82,17 +82,23 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 		incTime = "00:00"
 	}
 
-	query := "INSERT INTO yformula (formula_id, client_id, formula_name, " +
-		"field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, " +
-		"field11, field12, field13, field14, field15, field16, field17, field18, field19, field20," +
-		"formula, formula_type, formula_time, formula_create_datetime, is_active) " +
-		"VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27," +
-		"$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54," +
-		"$55,$56,$57,$58)"
+	query := `INSERT INTO yformula (formula_id, client_id, formula_name, 
+		f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, 
+        f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, 
+        f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, 
+        f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, 
+        f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, 
+        formula, formula_type, formula_time, formula_create_datetime, is_active) 
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,
+		$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,
+		$55,$56,$57,$58)`
 
 	result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName,
 		incField1, incField2, incField3, incField4, incField5, incField6, incField7, incField8, incField9, incField10,
 		incField11, incField12, incField13, incField14, incField15, incField16, incField17, incField18, incField19, incField20,
+		incField21, incField22, incField23, incField24, incField25, incField26, incField27, incField28, incField29, incField30,
+		incField31, incField32, incField33, incField34, incField35, incField36, incField37, incField38, incField39, incField40,
+		incField41, incField42, incField43, incField44, incField45, incField46, incField47, incField48, incField49, incField50,
 		incFormula, incType, incTime, incTimeNow, true)
 
 	if err != nil {
@@ -135,9 +141,10 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 		modules.DoLog("INFO", incTraceCode, "API", "Auth",
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
+		/* TEMP REMOVE AUTH FOR TEST */
 
-		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		//incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
+		//incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incType := modules.GetStringFromMapInterface(mapIncoming, "type")
 		incTime := modules.GetStringFromMapInterface(mapIncoming, "time")
@@ -148,7 +155,8 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			isTypeValid = true
 		}
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid {
+		//if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid {
+		if len(incClientID) > 0 && len(incType) > 0 && isTypeValid {
 
 			isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
 

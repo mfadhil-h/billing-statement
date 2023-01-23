@@ -2,14 +2,13 @@ package main
 
 import (
 	"billing/Config"
-	"billing/CoreApplication/Cron/CronProcessed"
+	"billing/CoreApplication/CronRealtime/CronProcessed"
 	"billing/modules"
 	"context"
 	"database/sql"
 	"fmt"
 	"github.com/go-co-op/gocron"
 	"github.com/go-redis/redis/v8"
-	guuid "github.com/google/uuid"
 	"github.com/jinzhu/now"
 	_ "github.com/lib/pq"
 	"runtime"
@@ -179,7 +178,8 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 				mapRedis["time"] = strTime
 				jsonRedis := modules.ConvertMapInterfaceToJSON(mapRedis)
 
-				redisKey := "test_" + strFormulaID
+				redisKey := processType + "_" + Config.ConstRedisKey + strFormulaID
+				//redisKey := "test_" + strFormulaID
 				errR := modules.RedisSet(rc, cx, redisKey, jsonRedis, 0)
 				if errR == nil {
 					//fmt.Println("Success load : ", strFormulaID)
@@ -194,7 +194,6 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 func readRedisFormula(rc *redis.Client, cx context.Context) {
 
 	incTraceCode := modules.GenerateUUID()
-	incTransactionID := guuid.New().String()
 	refDayNow := modules.DoFormatDateTime("0D", time.Now())
 	refDateNow := modules.DoFormatDateTime("YYYY-0M-0D", time.Now())
 	refTimeNow := modules.DoFormatDateTime("HH:mm", time.Now())
@@ -203,50 +202,61 @@ func readRedisFormula(rc *redis.Client, cx context.Context) {
 	refEndMonth := modules.DoFormatDateTime("YYYY-0M-0D", now.BeginningOfMonth())
 
 	redisKey := processType + "_" + Config.ConstRedisKey + "*"
+	modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+		fmt.Sprintf("redisKey: %s", redisKey), false, nil)
 
 	isValid, arrRedis := modules.RedisKeysByPattern(rc, cx, redisKey)
 	if isValid {
+		modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+			fmt.Sprintf("arrRedis: %+v", arrRedis), false, nil)
 		for x := 0; x < len(arrRedis); x++ {
-
+			modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+				fmt.Sprintf("arrRedis[x]: %s", arrRedis[x]), false, nil)
 			arrRedisID := strings.Split(arrRedis[x], "_")
-			strFormulaID := arrRedisID[1]
+			modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+				fmt.Sprintf("arrRedisID: %+v", arrRedisID), false, nil)
+			strFormulaID := arrRedisID[2]
 
 			redisVal, errR := modules.RedisGet(rc, cx, arrRedis[x])
 			if errR == nil {
+				modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+					fmt.Sprintf("redisVal: %+v", redisVal), false, nil)
 				mapRedis := modules.ConvertJSONStringToMap("", redisVal)
+				modules.DoLog("INFO", incTraceCode, "CRONREALTIME", "readRedisFormula",
+					fmt.Sprintf("mapRedis: %+v", mapRedis), false, nil)
 				strClient := modules.GetStringFromMapInterface(mapRedis, "client")
-				strFormula := modules.GetStringFromMapInterface(mapRedis, "formula")
+				//strFormula := modules.GetStringFromMapInterface(mapRedis, "formula") // failed cuz its array
 				strType := modules.GetStringFromMapInterface(mapRedis, "type")
 				strTime := modules.GetStringFromMapInterface(mapRedis, "time")
 
 				if strings.ToUpper(strType) == "DAY" && refTimeNow == strTime {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(fmt.Sprintf("%s", refDayName)) == strings.ToUpper(strType) && refTimeNow == strTime {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "STARTMONTH" && refStartMonth == refDateNow && refTimeNow == strTime {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "ENDMONTH" && refEndMonth == refDateNow && refTimeNow == strTime {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == refDayNow && refTimeNow == strTime {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "REALTIME" {
-					fmt.Println(strFormulaID, strType, strTime, strFormula)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
+					fmt.Println(strFormulaID, strType, strTime)
+					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 			}
 		}

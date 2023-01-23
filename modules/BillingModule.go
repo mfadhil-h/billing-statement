@@ -202,36 +202,37 @@ func DoCheckRedisClientHit(rc *redis.Client, cx context.Context, incClient strin
 
 func ReloadFormulaToRedis(db *sql.DB, rc *redis.Client, cx context.Context, incFormulaID string) {
 
-	var arrField [20]string
-	var arrColumn []string
+	var arrF [50]string
+	var arrC []string
 
-	if len(incFormulaID) == 0 {
-		incFormulaID = "%"
-	}
-
-	query := "SELECT field1, field2, field3, field4, field5, field6, field7, field8, field9, field10, " +
-		"field11, field12, field13, field14, field15, field16, field17, field18, field19, field20," +
+	query := "SELECT f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, " +
+		"f11, f12, f13, f14, f15, f16, f17, f18, f19, f20," +
+		"f21, f22, f23, f24, f25, f26, f27, f28, f29, f30," +
+		"f31, f32, f33, f34, f35, f36, f37, f38, f39, f40," +
+		"f41, f42, f43, f44, f45, f46, f47, f48, f49, f50," +
 		"formula, client_id, formula_id, formula_type, formula_time " +
-		"FROM formula WHERE formula_id LIKE $1 AND is_active = true"
+		"FROM yformula WHERE is_active = true"
 
-	rows, err := db.Query(query, incFormulaID)
+	rows, err := db.Query(query)
 
 	if err != nil {
 		fmt.Println("FAILED : ", err)
 	} else {
-		arrColumn, _ = rows.Columns()
+		arrC, _ = rows.Columns()
 
 		for rows.Next() {
-			var rawField [20]sql.NullString
+			var rawF [50]sql.NullString
 			var rawFormula sql.NullString
 			var rawClientID sql.NullString
 			var rawFormulaID sql.NullString
 			var rawType sql.NullString
 			var rawTime sql.NullTime
 
-			errP := rows.Scan(&rawField[0], &rawField[1], &rawField[2], &rawField[3], &rawField[4], &rawField[5],
-				&rawField[6], &rawField[7], &rawField[8], &rawField[9], &rawField[10], &rawField[11], &rawField[12],
-				&rawField[13], &rawField[14], &rawField[15], &rawField[16], &rawField[17], &rawField[18], &rawField[19],
+			errP := rows.Scan(&rawF[0], &rawF[1], &rawF[2], &rawF[3], &rawF[4], &rawF[5], &rawF[6], &rawF[7], &rawF[8], &rawF[9], &rawF[10],
+				&rawF[11], &rawF[12], &rawF[13], &rawF[14], &rawF[15], &rawF[16], &rawF[17], &rawF[18], &rawF[19], &rawF[20],
+				&rawF[21], &rawF[22], &rawF[23], &rawF[24], &rawF[25], &rawF[26], &rawF[27], &rawF[28], &rawF[29], &rawF[30],
+				&rawF[31], &rawF[32], &rawF[33], &rawF[34], &rawF[35], &rawF[36], &rawF[37], &rawF[38], &rawF[39], &rawF[40],
+				&rawF[41], &rawF[42], &rawF[43], &rawF[44], &rawF[45], &rawF[46], &rawF[47], &rawF[48], &rawF[49],
 				&rawFormula, &rawClientID, &rawFormulaID, &rawType, &rawTime)
 
 			if errP != nil {
@@ -247,21 +248,121 @@ func ReloadFormulaToRedis(db *sql.DB, rc *redis.Client, cx context.Context, incF
 					strTime = DoFormatDateTime("HH:mm", rawTime.Time)
 				}
 
-				for x := 0; x < len(arrField); x++ {
-					arrField[x] = ConvertSQLNullStringToString(rawField[x])
-					if len(arrField[x]) > 0 {
-						strFormula = strings.Replace(strFormula, arrField[x], arrColumn[x], -1)
+				//for x := 0; x < len(arrF); x++ {
+				for x := len(arrF) - 1; x >= 0; x-- {
+					arrF[x] = ConvertSQLNullStringToString(rawF[x])
+					if len(arrF[x]) > 0 {
+						strFormula = strings.Replace(strFormula, arrF[x], arrC[x], -1)
+					}
+				}
+
+				var strInsertAsResult []string
+				var strInsertAsFormula []string
+
+				var strInsertAsResultString []string
+
+				var strOutputHeader []string
+
+				var strOutputDataGroup []string
+				var strOutputRecapGroup []string
+
+				arrFormulas := strings.Split(strFormula, "@")
+				for x := 0; x < len(arrFormulas); x++ {
+					arrContent := strings.Split(arrFormulas[x], ":")
+
+					if len(arrFormulas[x]) > 1 && len(arrContent) > 1 {
+
+						incID := arrContent[0]
+						incParameter := strings.TrimLeft(strings.TrimRight(arrContent[1], " "), " ")
+
+						if strings.ToUpper(incID) == "STRING" {
+							fmt.Println(incParameter)
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawResults := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strInsertAsResultString = append(strInsertAsResultString, rawResults)
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "FORMULA" {
+							fmt.Println(incParameter)
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawResults := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strInsertAsResult = append(strInsertAsResult, rawResults)
+								}
+								if y == 1 {
+									rawFormulas := strings.TrimLeft(strings.TrimRight(rawParameter[1], " "), " ")
+									strInsertAsFormula = append(strInsertAsFormula, rawFormulas)
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "OUTPUTHEADER" {
+							fmt.Println(incParameter)
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawHeader := strings.Split(rawParameter[0], ",")
+
+									for z := 0; z < len(rawHeader); z++ {
+										rawHeaders := strings.TrimLeft(strings.TrimRight(rawHeader[z], " "), " ")
+										strOutputHeader = append(strOutputHeader, rawHeaders)
+									}
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "OUTPUTDATAGROUP" {
+							fmt.Println(incParameter)
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawGroup := strings.Split(rawParameter[0], ",")
+
+									for z := 0; z < len(rawGroup); z++ {
+										rawGroups := strings.TrimLeft(strings.TrimRight(rawGroup[z], " "), " ")
+										strOutputDataGroup = append(strOutputDataGroup, rawGroups)
+									}
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "OUTPUTRECAPGROUP" {
+							fmt.Println(incParameter)
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawFormulas := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strOutputRecapGroup = append(strOutputRecapGroup, rawFormulas)
+								}
+							}
+						}
 					}
 				}
 
 				var mapRedis = make(map[string]interface{})
 				mapRedis["client"] = strClientID
-				mapRedis["formula"] = strFormula
+				mapRedis["formula"] = strInsertAsFormula
+				mapRedis["result"] = strInsertAsResult
+				mapRedis["string"] = strInsertAsResultString
+				mapRedis["header"] = strOutputHeader
+				mapRedis["data"] = strOutputDataGroup
+				mapRedis["recap"] = strOutputRecapGroup
 				mapRedis["type"] = strType
 				mapRedis["time"] = strTime
 				jsonRedis := ConvertMapInterfaceToJSON(mapRedis)
 
-				redisKey := Config.ConstRedisKey + strFormulaID
+				redisKey := strType + "_" + Config.ConstRedisKey + strFormulaID
 				errR := RedisSet(rc, cx, redisKey, jsonRedis, 0)
 				if errR == nil {
 					//fmt.Println("Success load : ", strFormulaID)
