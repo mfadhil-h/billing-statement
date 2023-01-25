@@ -233,6 +233,8 @@ func getSUM(db *sql.DB, incFormula string, incProcessID string) float64 {
 
 	query := "SELECT SUM(" + rawFormula + "::NUMERIC) FROM ydata " +
 		"WHERE process_id = $1"
+	modules.DoLog("INFO", "incTraceCode", "CRON", "getSUM",
+		"query: "+query, false, nil)
 
 	rows, err := db.Query(query, incProcessID)
 

@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	InfoColor = Teal
-	WarnColor = Yellow
+	InfoColor  = Teal
+	WarnColor  = Yellow
 	ErrorColor = Red
 )
 
@@ -43,17 +43,16 @@ var (
 	White   = Color("\033[1;37m%s\033[0m")
 )
 
-
 type logData struct {
-	Datetime  		string		`bson:"datetime"`
-	LogLevel  		string		`bson:"loglevel"`
-	TraceID 		string    	`bson:"traceid"`
-	Application 	string    	`bson:"application"`
-	Module 			string    	`bson:"module"`
-	Function 		string    	`bson:"function"`
-	Message 		string    	`bson:"message"`
-	ErrorMessage 	string    	`bson:"errormessage"`
-	Status 			string    	`bson:"status"`
+	Datetime     string `bson:"datetime"`
+	LogLevel     string `bson:"loglevel"`
+	TraceID      string `bson:"traceid"`
+	Application  string `bson:"application"`
+	Module       string `bson:"module"`
+	Function     string `bson:"function"`
+	Message      string `bson:"message"`
+	ErrorMessage string `bson:"errormessage"`
+	Status       string `bson:"status"`
 }
 
 func DoLogDB(db *mongo.Client, ctx context.Context, dbLog string, incLogLevel string, incTraceID string, incApplication string,
@@ -280,14 +279,14 @@ func MapInterfaceHasKey(theMap map[string]interface{}, theKey string) bool {
 	return exist
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func MapStringHasKey(theMap map[string]string, theKey string) bool {
 	_, exist := theMap[theKey]
 
 	return exist
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func DoHashMD5(theStr string) string {
 	hasher := md5.New()
 
@@ -388,7 +387,7 @@ func GetFloatFromMapInterface(theMap map[string]interface{}, theKey string) floa
 	return theValue
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GetStringFromMapString(theMap map[string]string, theKey string) string {
 	theValue := ""
 
@@ -436,6 +435,21 @@ func ConvertJSONStringToMap(messageId string, theJSON string) map[string]interfa
 	return resultMap
 }
 
+func ConvertJSONStringToMapString(messageId string, theJSON string) map[string]string {
+	resultMap := make(map[string]string)
+
+	err := json.Unmarshal([]byte(theJSON), &resultMap)
+
+	if err != nil {
+		log.Debugln(messageId + " ." + fmt.Sprintf("Failed to convert json to map for json content: %s", theJSON))
+		resultMap = nil
+	} else {
+		log.Debugln(fmt.Sprintf("Success converting json %s to hashmap: %+v", theJSON, resultMap))
+	}
+
+	return resultMap
+}
+
 func ConvertMapStringToString(m map[string]string) string {
 	b := new(bytes.Buffer)
 	for key, value := range m {
@@ -444,7 +458,7 @@ func ConvertMapStringToString(m map[string]string) string {
 	return b.String()
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GenerateRandomNumericString(strLength int) string {
 	var letters = []rune("1234567890")
 
@@ -457,9 +471,7 @@ func GenerateRandomNumericString(strLength int) string {
 	return string(b)
 }
 
-
-
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GenerateRandomAlphaNumericString(strLength int) string {
 	var letters = []rune("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZ")
 
@@ -472,7 +484,7 @@ func GenerateRandomAlphaNumericString(strLength int) string {
 	return string(b)
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GenerateRandomAlphabeticalString(strLength int) string {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZ")
 
@@ -609,7 +621,7 @@ func DoFormatDateTime(dateTimeFormat string, theTime time.Time) string {
 	return theReturn
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GetStringInBetweenInsideBoundary(str string, start string, end string) (result string) {
 	fmt.Println("GetStringInBetweenInsideBoundary - start: " + start + ", end: " + end + ", from string: " + str)
 	s := strings.Index(str, start)
@@ -628,7 +640,7 @@ func GetStringInBetweenInsideBoundary(str string, start string, end string) (res
 	return withoutStartStr[0:e]
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func GetStringInBetweenOutsideBoundary(str string, start string, end string) (result string) {
 	s := strings.Index(str, start)
 	if s == -1 {
@@ -639,7 +651,7 @@ func GetStringInBetweenOutsideBoundary(str string, start string, end string) (re
 	return str[s:e]
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func DoReverseString(theString string) string {
 	runes := []rune(theString)
 
@@ -650,13 +662,13 @@ func DoReverseString(theString string) string {
 	return string(runes)
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func DoMD5(theString string) string {
 	hash := md5.Sum([]byte(theString))
 	return hex.EncodeToString(hash[:])
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func DoSHA1(theString string) string {
 	h := sha1.New()
 	h.Write([]byte(theString))
@@ -665,7 +677,7 @@ func DoSHA1(theString string) string {
 	return sha1Hash
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func ConvertMapInterfaceToMapString(mapInterface map[string]interface{}) map[string]string {
 	mapHasil := make(map[string]string)
 
@@ -698,7 +710,7 @@ func ConvertMapInterfaceToMapString(mapInterface map[string]interface{}) map[str
 	return mapHasil
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func ConvertIntToStringFixLength(emptySpaceFiller string, fillerPosition string, theExpectedLength int, theInteger int) string {
 	// fillerPosition = "RIGHT" or "LEFT"
 	response := ""
@@ -751,7 +763,7 @@ func ConvertInt64ToStringFixLength(emptySpaceFiller string, fillerPosition strin
 	return response
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func IsStringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
@@ -761,7 +773,7 @@ func IsStringInSlice(a string, list []string) bool {
 	return false
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func DoAppendStringToSlice(slice []string, data ...string) []string {
 	m := len(slice)
 	n := m + len(data)
@@ -912,15 +924,12 @@ func EndOfMonth(date time.Time) time.Time {
 }
 
 func Tracing() string {
-	pc := make([]uintptr, 10)  // at least 1 entry needed
+	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	file, line := f.FileLine(pc[0])
 	fmt.Printf("%s:%d %s\n", file, line, f.Name())
 	arrFunc := strings.Split(f.Name(), ".")
 
-
-
 	return arrFunc[len(arrFunc)-1]
 }
-
