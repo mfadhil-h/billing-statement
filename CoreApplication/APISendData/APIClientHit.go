@@ -10,6 +10,10 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -18,7 +22,8 @@ import (
 	"time"
 )
 
-var db *sql.DB
+var dbPostgres *sql.DB
+var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
@@ -75,19 +80,18 @@ func loadCredentialToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 
 }
 
-
 func main() {
 	// Load configuration file
 	modules.InitiateGlobalVariables(Config.ConstProduction)
 	runtime.GOMAXPROCS(4)
 
-	// Initiate Database
+	// Initiate Postgres Database
 	var errDB error
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		modules.MapConfig["databaseHost"], modules.MapConfig["databasePort"], modules.MapConfig["databaseUser"],
 		modules.MapConfig["databasePass"], modules.MapConfig["databaseName"])
 
-	db, errDB = sql.Open("postgres", psqlInfo) // db udah di defined diatas, jadi harus pake = bukan :=
+	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
 		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
@@ -95,21 +99,49 @@ func main() {
 		panic(errDB)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	dbPostgres.SetConnMaxLifetime(time.Minute * 10)
+	dbPostgres.SetMaxIdleConns(5)
+	dbPostgres.SetMaxOpenConns(50)
 
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
 			fmt.Println("Failed to close DB Connection.")
 		}
-	}(db)
+	}(dbPostgres)
 
-	errDB = db.Ping()
+	errDB = dbPostgres.Ping()
 	if errDB != nil {
 		panic(errDB)
 	}
+
+	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if errDB != nil {
+		panic(errDB)
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	errDB = client.Connect(ctx)
+	if errDB != nil {
+		panic(errDB)
+	}
+	defer client.Disconnect(ctx)
+	errDB = client.Ping(ctx, readpref.Primary())
+	if errDB != nil {
+		panic(errDB)
+	}
+	databases, err := client.ListDatabaseNames(ctx, bson.M{})
+	if err != nil {
+		panic(errDB)
+	}
+	fmt.Println(databases)
+
+	dbMongo = client.Database("billing_settlement")
+	//command := bson.D{{"create", "newCollection01"}}
+	//var result bson.M
+	//if errDB = db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
+	//	panic(errDB)
+	//}
+	//fmt.Println(fmt.Sprintf("success: %+v", result))
 
 	// Initiate Redis
 	rc = modules.InitiateRedisClient()
@@ -123,11 +155,10 @@ func main() {
 
 	go func() {
 		for {
-			loadCredentialToRedis(db, rc, cx)
+			loadCredentialToRedis(dbPostgres, rc, cx)
 			time.Sleep(10 * time.Second)
 		}
 	}()
-
 
 	// APITransaction API
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -169,17 +200,17 @@ func main() {
 			var incomingHeader = make(map[string]interface{})
 			incomingHeader["Content-Type"] = r.Header.Get("Content-Type")
 
-			//modules.SaveIncomingRequest(db, incTraceCode, strURL, remoteIPAddress, incomingBody)
+			//modules.SaveIncomingRequest(dbPostgres, incTraceCode, strURL, remoteIPAddress, incomingBody)
 
 			mapIncoming := modules.ConvertJSONStringToMap("", incomingBody)
 			//incReqType := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
 			// Route the request
 			if incURL == "send" {
-				_, responseHeader, responseContent = APISendData.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				_, responseHeader, responseContent = APISendData.Process(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 			}
 
-			//modules.SaveIncomingResponse(db, tracecodeX, responseHeader, responseContent)
+			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
 
 			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
 				"responseHeader: "+fmt.Sprintf("%+v", responseHeader)+", responseContent: "+responseContent,

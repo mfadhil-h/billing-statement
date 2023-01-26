@@ -307,6 +307,18 @@ func GetStringFromMapInterface(theMap map[string]interface{}, theKey string) str
 	return theValue
 }
 
+func GetArrayMapInterfaceFromMapInterface(theMap map[string]interface{}, theKey string) map[string]interface{} {
+	var theValue map[string]interface{}
+
+	_, exist := theMap[theKey]
+
+	if exist == true && theMap[theKey] != nil {
+		theValue = theMap[theKey].([]interface{})[0].(map[string]interface{})
+	}
+
+	return theValue
+}
+
 func GetBoolFromMapInterface(theMap map[string]interface{}, theKey string) bool {
 	theValue := false
 
@@ -422,6 +434,21 @@ func ConvertMapInterfaceToJSON(theMap map[string]interface{}) string {
 
 func ConvertJSONStringToMap(messageId string, theJSON string) map[string]interface{} {
 	resultMap := make(map[string]interface{})
+
+	err := json.Unmarshal([]byte(theJSON), &resultMap)
+
+	if err != nil {
+		log.Debugln(messageId + " ." + fmt.Sprintf("Failed to convert json to map for json content: %s", theJSON))
+		resultMap = nil
+	} else {
+		log.Debugln(fmt.Sprintf("Success converting json %s to hashmap: %+v", theJSON, resultMap))
+	}
+
+	return resultMap
+}
+
+func ConvertJSONStringToMapArray(messageId string, theJSON string) []map[string]interface{} {
+	var resultMap []map[string]interface{}
 
 	err := json.Unmarshal([]byte(theJSON), &resultMap)
 

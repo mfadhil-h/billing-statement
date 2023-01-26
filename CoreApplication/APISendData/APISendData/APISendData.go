@@ -6,6 +6,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -124,7 +128,64 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 	return isSuccess
 }
 
-func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+func saveToDatabaseV2(db *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) bool {
+
+	var incDatas []map[string]interface{}
+	//isSuccess := true
+
+	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
+	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
+	collectionName := incClientID + "_" + incFormulaID
+	//incProcessID := modules.GenerateUUID()
+	incTimeNow := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
+
+	//incDatas := mapIncoming["datas"].([]map[string]interface{})
+	rawDatas := mapIncoming["datas"].([]interface{})
+	for _, data := range rawDatas {
+		mapData := data.(map[string]interface{})
+		incDatas = append(incDatas, mapData)
+	}
+	names, err := db.ListCollectionNames(cx, bson.M{})
+	if err != nil {
+		return false
+	}
+	isCollExist := false
+	for _, name := range names {
+		if name == collectionName {
+			isCollExist = true
+			break
+		}
+	}
+	if !isCollExist {
+		command := bson.D{{"create", collectionName}}
+		var result bson.M
+		if errDB := db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
+			panic(errDB)
+		}
+	}
+	collection := db.Collection(collectionName)
+
+	for i, data := range incDatas {
+		incDataID := modules.GetStringFromMapInterface(data, "dataid")
+		if !(len(incDatas) > 0) {
+			incDataID = strings.ToUpper(incFormulaID) + "DATA00" + strconv.FormatInt(int64(i+1), 10)
+		}
+		data["data_id"] = incDataID
+		data["formula_id"] = incFormulaID
+		data["client_id"] = incClientID
+		data["data_receive_datetime"] = incTimeNow
+		one, errIns := collection.InsertOne(cx, data)
+		if errIns != nil {
+			return false
+		}
+		println(fmt.Sprintf("insert one: %+v", one))
+		//jsonData := modules.ConvertMapInterfaceToJSON(data)
+
+	}
+	return true
+}
+
+func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
 
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
@@ -157,7 +218,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		//if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid && isCredentialValid {
 		if len(incClientID) > 0 && len(incFormulaID) > 0 && isValid {
 
-			isSuccess := saveToDatabase(db, incTraceCode, mapIncoming)
+			isSuccess := saveToDatabaseV2(dbMongo, rc, cx, incTraceCode, mapIncoming)
 
 			if isSuccess {
 				respStatus = "000"
