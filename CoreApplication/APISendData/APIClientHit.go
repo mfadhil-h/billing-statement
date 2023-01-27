@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -129,13 +128,13 @@ func main() {
 	if errDB != nil {
 		panic(errDB)
 	}
-	databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		panic(errDB)
-	}
-	fmt.Println(databases)
 
 	dbMongo = client.Database("billing_settlement")
+	//databases, err := client.ListDatabaseNames(ctx, bson.M{})
+	//if err != nil {
+	//	panic(errDB)
+	//}
+	//fmt.Println(databases)
 	//command := bson.D{{"create", "newCollection01"}}
 	//var result bson.M
 	//if errDB = db.RunCommand(context.TODO(), command).Decode(&result); err != nil {

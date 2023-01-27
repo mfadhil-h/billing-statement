@@ -9,6 +9,10 @@ import (
 	"github.com/Knetic/govaluate"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"runtime"
 	"strconv"
 	"strings"
@@ -516,11 +520,11 @@ func ReloadFormulaToRedisV2(db *sql.DB, rc *redis.Client, cx context.Context) {
 	}
 }
 
-func GetFormula(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incClientID string, incFormulaID string) {
+func GetFormula(dbPosgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, incClientID string, incFormulaID string) {
 
 	queryX := `SELECT client_id, formula_id FROM yformula_v3 WHERE client_id LIKE $1 AND formula_id LIKE $2`
 
-	rowsX, errX := db.Query(queryX, "%"+incClientID+"%", "%"+incFormulaID+"%")
+	rowsX, errX := dbPosgres.Query(queryX, "%"+incClientID+"%", "%"+incFormulaID+"%")
 
 	if errX != nil {
 		fmt.Println("FAILED : ", errX)
@@ -537,7 +541,7 @@ func GetFormula(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode s
 				strClientID := modules.ConvertSQLNullStringToString(rawClientID)
 				strFormulaID := modules.ConvertSQLNullStringToString(rawFormulaID)
 				println("Formula Ready strClientID: " + strClientID + ", strFormulaID: " + strFormulaID)
-				GetDataV2(db, rc, cx, incTraceCode, strClientID, strFormulaID)
+				GetDataV2(dbPosgres, dbMongo, rc, cx, incTraceCode, strClientID, strFormulaID)
 			}
 		}
 	}
@@ -644,10 +648,10 @@ func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 }
 
-func GetDataV2(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incClientID string, incFormulaID string) {
+func GetDataV2(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, incClientID string, incFormulaID string) {
 
 	var mapDatas []map[string]interface{}
-	incDataID := ""
+	//incDataID := ""
 	isFunctionInFormula := false
 	strReceiveDateTime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
 
@@ -660,81 +664,102 @@ func GetDataV2(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode st
 
 	incProcessID := modules.GenerateUUID()
 
-	queryX := `SELECT datas, data_id, data_receive_datetime FROM ydata_v2 
-        WHERE is_process = false AND client_id = $1 AND formula_id = $2`
-	println("Before Query DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
+	collection := dbMongo.Collection("RUMIPENDY466_RUMIPENDY466HITJAK")
+	filter := bson.D{{Key: "formula_id", Value: "RUMIPENDY466HITJAK"}}
 
-	rowsX, errX := db.Query(queryX, incClientID, incFormulaID)
+	//queryX := `SELECT datas, data_id, data_receive_datetime FROM ydata_v2
+	//    WHERE is_process = false AND client_id = $1 AND formula_id = $2`
+	//println("Before Query DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
 
-	if errX != nil {
-		fmt.Println("FAILED : ", errX)
-	} else {
-		println("Before Next DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
-		for rowsX.Next() {
-			println("Before Scan DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
-			//var rawClientID sql.NullString
-			//var rawFormulaID sql.NullString
-			var rawDatas sql.NullString
-			var rawDataID sql.NullString
-			var rawReceiveDateTime sql.NullString
+	//rowsX, errX := dbPostgres.Query(queryX, incClientID, incFormulaID)
 
-			errPX := rowsX.Scan(&rawDatas, &rawDataID, &rawReceiveDateTime)
+	//if errX != nil {
+	//	fmt.Println("FAILED : ", errX)
+	//} else {
+	//	println("Before Next DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
+	//	for rowsX.Next() {
+	//println("Before Scan DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID)
+	////var rawClientID sql.NullString
+	////var rawFormulaID sql.NullString
+	//var rawDatas sql.NullString
+	//var rawDataID sql.NullString
+	//var rawReceiveDateTime sql.NullString
+	//
+	//errPX := rowsX.Scan(&rawDatas, &rawDataID, &rawReceiveDateTime)
+	//
+	//if errPX != nil {
+	//	fmt.Println("FAILED : ", errPX)
+	//} else {
+	//}
+	//}
+	//}
 
-			if errPX != nil {
-				fmt.Println("FAILED : ", errPX)
-			} else {
-				//var mapResults = make(map[string]string)
-				//strClientID := modules.ConvertSQLNullStringToString(rawClientID)
-				//strFormulaID := modules.ConvertSQLNullStringToString(rawFormulaID)
-				incDataID = modules.ConvertSQLNullStringToString(rawDataID)
-				strDatas := modules.ConvertSQLNullStringToString(rawDatas)
-				strReceiveDateTime = modules.ConvertSQLNullStringToString(rawReceiveDateTime)
-				mapData := modules.ConvertJSONStringToMap("", strDatas)
-				println("Ready DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID + fmt.Sprintf(", \nmapData %+v", mapData))
-				for key, value := range mapData {
-					strF := value.(string)
-					fltF, errParse := strconv.ParseFloat(strF, 64)
-					if errParse == nil {
-						mapData[key] = fltF
-					} else {
-						mapData[key] = strF
-					}
+	cursor, errC := collection.Find(cx, filter)
+	if errC != nil {
+		panic(errC)
+	}
+	var results []map[string]interface{}
+	errC = cursor.All(cx, &results)
+	if errC != nil {
+		panic(errC)
+	}
+	println(fmt.Sprintf("resulst: %+v", results))
+	for _, result := range results {
+		//var mapResults = make(map[string]string)
+		//strClientID := modules.ConvertSQLNullStringToString(rawClientID)
+		//strFormulaID := modules.ConvertSQLNullStringToString(rawFormulaID)
+		//incDataID = modules.ConvertSQLNullStringToString(rawDataID)
+		//strDatas := modules.ConvertSQLNullStringToString(rawDatas)
+		//strReceiveDateTime = modules.ConvertSQLNullStringToString(rawReceiveDateTime)
+		//mapData := modules.ConvertJSONStringToMap("", strDatas)
+		println("Ready DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID + fmt.Sprintf(", \nmapData %+v", result))
+		for key, value := range result {
+			println(fmt.Sprintf(", \nkey %+v", key))
+			if key != "_id" {
+				strF := value.(string)
+				fltF, errParse := strconv.ParseFloat(strF, 64)
+				if errParse == nil {
+					result[key] = fltF
+				} else {
+					result[key] = strF
 				}
-
-				//strType := modules.GetStringFromMapInterface(mapRedis, "type")
-				//strTime := modules.GetStringFromMapInterface(mapRedis, "time")
-
-				//var strResult string
-
-				for x := 0; x < len(arrFormula); x++ {
-					//isSuccess := false
-					isFunctionSub := false
-					strResult := ""
-					theFormula := fmt.Sprintf("%v", arrFormula[x])
-					theResult := fmt.Sprintf("%v", arrResult[x])
-
-					mapData["dataid"] = incDataID
-					mapData["processid"] = incProcessID
-
-					_, isFunctionSub, strResult = processForNonStringV2(db, rc, cx, theFormula, mapData)
-					if isFunctionSub {
-						mapData[theResult] = "0"
-						isFunctionInFormula = isFunctionSub
-					} else {
-						fltF, errParse := strconv.ParseFloat(strResult, 64)
-						if errParse == nil {
-							mapData[theResult] = fltF
-						} else {
-							mapData[theResult] = strResult
-						}
-						//mapData[theResult] = fltF
-					}
-				}
-				// Bila akan di kumpulkan datanya di table lain
-				//_, _ = processSavetoAnotherDB(db, rc, cx, incTraceCode, incDataID)
-				mapDatas = append(mapDatas, mapData)
 			}
 		}
+
+		//strType := modules.GetStringFromMapInterface(mapRedis, "type")
+		//strTime := modules.GetStringFromMapInterface(mapRedis, "time")
+
+		//var strResult string
+
+		for x := 0; x < len(arrFormula); x++ {
+			//isSuccess := false
+			isFunctionSub := false
+			strResult := ""
+			theFormula := fmt.Sprintf("%v", arrFormula[x])
+			theResult := fmt.Sprintf("%v", arrResult[x])
+
+			//result["dataid"] = incDataID
+			result["processid"] = incProcessID
+
+			_, isFunctionSub, strResult = processForNonStringV2(dbPostgres, rc, cx, theFormula, result)
+			if isFunctionSub {
+				result[theResult] = "0"
+				isFunctionInFormula = isFunctionSub
+			} else {
+				fltF, errParse := strconv.ParseFloat(strResult, 64)
+				if errParse == nil {
+					result[theResult] = fltF
+				} else {
+					result[theResult] = strResult
+				}
+				//mapData[theResult] = fltF
+			}
+		}
+		// Bila akan di kumpulkan datanya di table lain
+		//_, _ = processSavetoAnotherDB(dbPostgres, rc, cx, incTraceCode, incDataID)
+		mapDatas = append(mapDatas, result)
+	}
+	if len(mapDatas) > 0 {
 		println("MID DATA strClientID: " + incClientID + ", strFormulaID: " + incFormulaID + fmt.Sprintf(", \nmapDatas: %+v", mapDatas))
 		/* Calculate the function */
 		if isFunctionInFormula {
@@ -743,20 +768,20 @@ func GetDataV2(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode st
 				isFunction := false
 				theFormula := fmt.Sprintf("%v", arrFormula[x])
 				theResult := fmt.Sprintf("%v", arrResult[x])
-				isFunction, _ = checkFunctionV2(db, theFormula, incProcessID)
+				isFunction, _ = checkFunctionV2(dbPostgres, theFormula, incProcessID)
 				rawFormula := strings.ToUpper(theFormula)
 				if isFunction {
 					println("Check 1 theFormula: " + theFormula + ", theResult: " + theResult + fmt.Sprintf(", \nmapDatas: %+v", mapDatas))
 					if strings.Contains(rawFormula, "SUM") {
-						fltResult = getSUMV2(db, rawFormula, mapDatas)
+						fltResult = getSUMV2(dbPostgres, rawFormula, mapDatas)
 					} else if strings.Contains(rawFormula, "AVG") {
-						fltResult = getAVGV2(db, rawFormula, mapDatas)
+						fltResult = getAVGV2(dbPostgres, rawFormula, mapDatas)
 					} else if strings.Contains(rawFormula, "COUNT") {
-						fltResult = getCOUNTV2(db, rawFormula, mapDatas)
+						fltResult = getCOUNTV2(dbPostgres, rawFormula, mapDatas)
 					} else if strings.Contains(rawFormula, "MAX") {
-						fltResult = getMAXV2(db, rawFormula, mapDatas)
+						fltResult = getMAXV2(dbPostgres, rawFormula, mapDatas)
 					} else if strings.Contains(rawFormula, "MIN") {
-						fltResult = getMINV2(db, rawFormula, mapDatas)
+						fltResult = getMINV2(dbPostgres, rawFormula, mapDatas)
 					} else {
 						isFunction = false
 					}
@@ -772,7 +797,7 @@ func GetDataV2(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode st
 			/* save to Table Transaction/Result */
 			println("FINISHING DATA 01 strClientID: " + incClientID + ", strFormulaID: " + incFormulaID + fmt.Sprintf(", \nmapData: %+v", mapData))
 			jsonData := modules.ConvertMapInterfaceToJSON(mapData)
-			processSavetoAnotherDBV2(db, rc, cx, incTraceCode, mapData["dataid"].(string), incClientID, incFormulaID, incProcessID,
+			processSavetoAnotherDBV2(dbPostgres, rc, cx, incTraceCode, mapData["data_id"].(string), incClientID, incFormulaID, incProcessID,
 				jsonData, strReceiveDateTime)
 		}
 	}
@@ -1127,15 +1152,15 @@ func checkFunctionV2(db *sql.DB, incFormula string, incProcessID string) (bool, 
 	rawFormula := strings.ToUpper(incFormula)
 
 	if strings.Contains(rawFormula, "SUM") {
-		//fltResult = getSUM(db, incFormula, incProcessID)
+		//fltResult = getSUM(dbPostgres, incFormula, incProcessID)
 	} else if strings.Contains(rawFormula, "AVG") {
-		//fltResult = getAVG(db, incFormula, incProcessID)
+		//fltResult = getAVG(dbPostgres, incFormula, incProcessID)
 	} else if strings.Contains(rawFormula, "COUNT") {
-		//fltResult = getCOUNT(db, incFormula, incProcessID)
+		//fltResult = getCOUNT(dbPostgres, incFormula, incProcessID)
 	} else if strings.Contains(rawFormula, "MAX") {
-		//fltResult = getMAX(db, incFormula, incProcessID)
+		//fltResult = getMAX(dbPostgres, incFormula, incProcessID)
 	} else if strings.Contains(rawFormula, "MIN") {
-		//fltResult = getMIN(db, incFormula, incProcessID)
+		//fltResult = getMIN(dbPostgres, incFormula, incProcessID)
 	} else {
 		isValid = false
 	}
@@ -1161,7 +1186,7 @@ func processForNonString(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 
 		if err == nil {
 			updateDatabase(db, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)
-			//updateDatabase(db, "", incField, incResult, incDataID, incClientID, incProcessID)
+			//updateDatabase(dbPostgres, "", incField, incResult, incDataID, incClientID, incProcessID)
 			//if isSaveSuccess {
 			//	isSuccess = true
 			//	fmt.Println("RESULT " + incTraceCode + " ===> ", incResult)
@@ -1199,8 +1224,8 @@ func processForNonStringV2(db *sql.DB, rc *redis.Client, cx context.Context, inc
 		println(fmt.Sprintf("strResult: %+v", strResult))
 
 		if err == nil {
-			//updateDatabase(db, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)
-			//updateDatabase(db, "", incField, incResult, incDataID, incClientID, incProcessID)
+			//updateDatabase(dbPostgres, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)
+			//updateDatabase(dbPostgres, "", incField, incResult, incDataID, incClientID, incProcessID)
 			//if isSaveSuccess {
 			//	isSuccess = true
 			//	fmt.Println("RESULT " + incTraceCode + " ===> ", incResult)
@@ -1213,7 +1238,7 @@ func processForNonStringV2(db *sql.DB, rc *redis.Client, cx context.Context, inc
 			isSuccess = false
 		}
 	} else {
-		//updateDatabase(db, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)
+		//updateDatabase(dbPostgres, "incTraceCode", incField, incResult, incDataID, incProcessID, incClientID)
 
 	}
 	fmt.Println("Result : ", strResult)
@@ -1252,7 +1277,8 @@ func getPreviewData(db *sql.DB, rc *redis.Client, cx context.Context) {
 
 }
 
-var db *sql.DB
+var dbPostgres *sql.DB
+var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
@@ -1267,7 +1293,7 @@ func main() {
 		modules.MapConfig["databaseHost"], modules.MapConfig["databasePort"], modules.MapConfig["databaseUser"],
 		modules.MapConfig["databasePass"], modules.MapConfig["databaseName"])
 
-	db, errDB = sql.Open("postgres", psqlInfo) // db udah di defined diatas, jadi harus pake = bukan :=
+	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
 		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
@@ -1275,21 +1301,38 @@ func main() {
 		panic(errDB)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	dbPostgres.SetConnMaxLifetime(time.Minute * 10)
+	dbPostgres.SetMaxIdleConns(5)
+	dbPostgres.SetMaxOpenConns(50)
 
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
 			fmt.Println("Failed to close DB Connection.")
 		}
-	}(db)
+	}(dbPostgres)
 
-	errDB = db.Ping()
+	errDB = dbPostgres.Ping()
 	if errDB != nil {
 		panic(errDB)
 	}
+
+	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if errDB != nil {
+		panic(errDB)
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	errDB = client.Connect(ctx)
+	if errDB != nil {
+		panic(errDB)
+	}
+	defer client.Disconnect(ctx)
+	errDB = client.Ping(ctx, readpref.Primary())
+	if errDB != nil {
+		panic(errDB)
+	}
+
+	dbMongo = client.Database("billing_settlement")
 
 	//Initiate Redis
 	rc = modules.InitiateRedisClient()
@@ -1305,10 +1348,10 @@ func main() {
 
 	//getFormula()
 
-	//ReloadFormulaToRedis(db, rc, cx)
-	//GetData(db, rc, cx, "incTraceCode", "", "")
+	//ReloadFormulaToRedis(dbPostgres, rc, cx)
+	//GetData(dbPostgres, rc, cx, "incTraceCode", "", "")
 
-	ReloadFormulaToRedisV2(db, rc, cx)
-	GetFormula(db, rc, cx, "incTraceCode", "", "")
+	ReloadFormulaToRedisV2(dbPostgres, rc, cx)
+	GetFormula(dbPostgres, dbMongo, rc, cx, "incTraceCode", "", "")
 
 }
