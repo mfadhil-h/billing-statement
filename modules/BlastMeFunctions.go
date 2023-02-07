@@ -1554,7 +1554,7 @@ func IsClientSenderIdValidRedis(messageId string, redisClient *redis.Client, goC
 	return isValid, clientSenderIdId
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func SMSFunctionGetClientBalance(messageId string, db *sql.DB, clientId string) float64 {
 	var balance = 0.00
 
@@ -1582,7 +1582,7 @@ func SMSFunctionGetClientBalance(messageId string, db *sql.DB, clientId string) 
 	return balance
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func SMSFunctionIsGSM(message string) bool {
 	const gsmCharacters = "@£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞ^{}\\[~]|€ÆæßÉ!\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà\n "
 	isGsm := false

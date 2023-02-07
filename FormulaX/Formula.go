@@ -54,7 +54,7 @@ func getFormula(db *sql.DB, incFormula string) string {
 	}
 
 	fmt.Println("Formula : ", strFormula)
-	for x:=0; x < len(arrField)-1; x++ {
+	for x := 0; x < len(arrField)-1; x++ {
 		if len(arrField[x]) > 0 {
 			strFormula = strings.Replace(strFormula, arrField[x], arrColumn[x], -1)
 		}
@@ -100,7 +100,7 @@ func getData(db *sql.DB) {
 				strFormula := modules.ConvertSQLNullStringToString(rawFormula)
 
 				for x := 0; x < 20; x++ {
-					mapData["field" + fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
+					mapData["field"+fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
 				}
 
 				result := getResult(strFormula, mapData)
@@ -110,7 +110,6 @@ func getData(db *sql.DB) {
 		}
 	}
 }
-
 
 var db *sql.DB
 var redisClient *redis.Client
@@ -161,12 +160,6 @@ func main() {
 		fmt.Println("Success connected to Redis")
 	}
 
-
-
-
-
 	getData(db)
 
 }
-
-

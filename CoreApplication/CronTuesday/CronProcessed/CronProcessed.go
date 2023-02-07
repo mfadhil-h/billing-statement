@@ -64,7 +64,6 @@ func saveToDatabase(db *sql.DB, incTraceCode string, incDataID string, incTransa
 	return isSuccess
 }
 
-
 func getResult(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, incTransactionID string, incClientID string, incFormulaID string, incFormula string, mapData map[string]interface{}) (bool, string) {
 
 	isSuccess := false
@@ -77,7 +76,7 @@ func getResult(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode st
 		isSaveSuccess := saveToDatabase(db, incTraceCode, incDataID, incTransactionID, incClientID, incFormulaID, incResult)
 		if isSaveSuccess {
 			isSuccess = true
-			fmt.Println("RESULT " + incTraceCode + " ===> ", incResult)
+			fmt.Println("RESULT "+incTraceCode+" ===> ", incResult)
 			fmt.Println("")
 		} else {
 			isSuccess = false
@@ -117,7 +116,7 @@ func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			} else {
 
 				for x := 0; x < 20; x++ {
-					mapData["field" + fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
+					mapData["field"+fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
 				}
 
 				mapData["dataid"] = modules.ConvertSQLNullStringToString(rawDataID)
@@ -131,4 +130,3 @@ func GetData(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		}
 	}
 }
-

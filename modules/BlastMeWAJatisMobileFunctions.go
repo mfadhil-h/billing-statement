@@ -9,8 +9,8 @@ import (
 )
 
 // WA Jatis Mobile Account
-//var userId = "jatismobiletesting"
-//var password = "JatisMbl9048$"
+// var userId = "jatismobiletesting"
+// var password = "JatisMbl9048$"
 var jmUrl = "https://interactive.jatismobile.com"
 
 //func InitiateWABAJamobProperty(db *sql.DB) {

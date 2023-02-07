@@ -127,7 +127,7 @@ func getData(db *sql.DB, rc *redis.Client, cx context.Context) {
 				strFormula := modules.ConvertSQLNullStringToString(rawFormula)
 
 				for x := 0; x < 20; x++ {
-					mapData["field" + fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
+					mapData["field"+fmt.Sprintf("%v", x+1)] = modules.ConvertSQLNullFloat64ToFloat64(rawField[x])
 				}
 
 				result := getResult(rc, cx, strFormula, mapData)
@@ -137,9 +137,6 @@ func getData(db *sql.DB, rc *redis.Client, cx context.Context) {
 		}
 	}
 }
-
-
-
 
 var db *sql.DB
 var rc *redis.Client
@@ -202,5 +199,3 @@ func main() {
 		time.Sleep(10 * time.Second)
 	}
 }
-
-

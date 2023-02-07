@@ -112,7 +112,7 @@ func HTTPGETString(traceCode string, mainUrl string, headerRequest map[string]in
 	return mapResponse
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func HTTPPOSTString(traceCode string, url string, headerRequest map[string]interface{}, bodyRequest string) map[string]interface{} {
 	DoLog("DEBUG", traceCode, "NetworkTool", "HTTP_POST_String", fmt.Sprintf("HTTP POST - body: %s, header: %v", bodyRequest, headerRequest), false, nil)
 	var mapResponse = make(map[string]interface{})
@@ -189,7 +189,7 @@ func HTTPPOSTString(traceCode string, url string, headerRequest map[string]inter
 	return mapResponse
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func HTTPSPOSTString(traceCode string, url string, headerRequest map[string]interface{}, bodyRequest string) map[string]interface{} {
 	DoLog("DEBUG", traceCode, "NetworkTool", "HTTPS_POST_String", fmt.Sprintf("HTTP POST - body: %s, header: %v", bodyRequest, headerRequest), false, nil)
 	var mapResponse = make(map[string]interface{})
@@ -358,7 +358,7 @@ func HTTPSPatchString(traceCode string, url string, headerRequest map[string]int
 	return mapResponse
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func HTTPSGETString(traceCode string, mainUrl string, headerRequest map[string]interface{}, urlParameter map[string]string) map[string]interface{} {
 	DoLog("DEBUG", traceCode, "NetworkTool", "HTTPS_GET_String", fmt.Sprintf("HTTPS GET - body: %v, header: %v", urlParameter, headerRequest), false, nil)
 	var mapResponse = make(map[string]interface{})
@@ -455,7 +455,7 @@ func HTTPSGETString(traceCode string, mainUrl string, headerRequest map[string]i
 	return mapResponse
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func HTTPSPOSTForm(traceCode string, httpUrl string, headerRequest map[string]interface{}, mapFormContent map[string]string) map[string]interface{} {
 	DoLog("DEBUG", traceCode, "NetworkTool", "HTTPS_POST_FORM", fmt.Sprintf("HTTP POST - body: %s, header: %v", mapFormContent, headerRequest), false, nil)
 	var mapResponse = make(map[string]interface{})
@@ -546,7 +546,7 @@ func HTTPSPOSTForm(traceCode string, httpUrl string, headerRequest map[string]in
 	return mapResponse
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func HTTPSGETDownloadFile(traceCode string, fileUrl string, headerRequest map[string]interface{}, targetDirectory string, targetFileName string, downloadingTimeOut int) map[string]interface{} {
 	DoLog("DEBUG", traceCode, "NetworkTool", "HTTPS_GET_DOWNLOAD_FILE", fmt.Sprintf("HTTP GET - header: %v", headerRequest), false, nil)
 	var mapResponse = make(map[string]interface{})

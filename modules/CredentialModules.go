@@ -22,7 +22,6 @@ func generateSignature(incPhoneNumber string, incClientID string, incVariousID s
 	return strSignature
 }
 
-
 func CreateRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceID string, incClientID string, incPhoneNumber string, incPIN string) (string, bool) {
 
 	strSignature := ""
@@ -63,7 +62,6 @@ func CreateRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.
 					variousID := GenerateUUID()
 					strSignature = generateSignature(incPhoneNumber, incClientID, variousID)
 
-
 					redisKey := "tokenizer_" + incPhoneNumber
 
 					mapRedis := make(map[string]interface{})
@@ -74,7 +72,6 @@ func CreateRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.
 					RedisSet(redisClient, contextX, redisKey, redisValX, 0)
 
 					status = true
-
 
 				} else {
 					DoLog("ERROR", incTraceID, "Modules", "RedisSession",
@@ -87,14 +84,12 @@ func CreateRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.
 	return strSignature, status
 }
 
-
-func expandRefreshRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceID string, incClientID string, incPhoneNumber string) (string) {
+func expandRefreshRedisSession(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceID string, incClientID string, incPhoneNumber string) string {
 
 	strSignature := ""
 
 	variousID := GenerateUUID()
 	strSignature = generateSignature(incPhoneNumber, incClientID, variousID)
-
 
 	redisKey := "tokenizer_" + incPhoneNumber
 
@@ -174,7 +169,7 @@ func ValidateRedisSession(db *sql.DB, redisClient *redis.Client, contextX contex
 
 							if fltCount > 0 {
 								// Ada didatabase
-								return "", "002"  // Need to input pin
+								return "", "002" // Need to input pin
 							} else {
 								// Tidak ada didatabase
 								return "", "003" // Need to Login
@@ -199,4 +194,3 @@ func ValidateRedisSession(db *sql.DB, redisClient *redis.Client, contextX contex
 		return "", "003"
 	}
 }
-

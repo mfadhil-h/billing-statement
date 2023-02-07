@@ -17,7 +17,6 @@ import (
 	"time"
 )
 
-
 func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 
 	var arrField [20]string
@@ -142,7 +141,7 @@ func readRedisFormula(rc *redis.Client, cx context.Context) {
 				}
 
 				// Process running based on specific date and specific time
-				if strings.ToUpper(strType) == "DATE" + refDayNow && refTimeNow == strTime {
+				if strings.ToUpper(strType) == "DATE"+refDayNow && refTimeNow == strTime {
 					fmt.Println(refDateTimeNow, strFormulaID, strType, strTime)
 					CronProcessed.GetData(db, rc, cx, incTraceCode, incTransactionID, strClient, strFormulaID, strFormula)
 				}

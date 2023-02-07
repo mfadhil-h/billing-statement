@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func RedisInitiateRedisPool() *redis.Pool {
 	return &redis.Pool{
 		// Maximum number of idle connections in the pool.
@@ -29,7 +29,7 @@ func RedisInitiateRedisPool() *redis.Pool {
 	}
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func RedisSetDataRedis(traceCode string, redisKey string, redisVal string) bool {
 	result := true
 
@@ -56,7 +56,7 @@ func RedisSetDataRedis(traceCode string, redisKey string, redisVal string) bool 
 	return result
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func RedisSetDataRedisWithExpiry(traceCode string, redisKey string, redisVal string, expiry int32) bool { // expiry in second
 	result := true
 
@@ -81,7 +81,7 @@ func RedisSetDataRedisWithExpiry(traceCode string, redisKey string, redisVal str
 	return result
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func RedisGetDataRedis(traceCode string, redisKey string) string {
 	//fmt.Println("GET redisKey: " + redisKey)
 
@@ -132,7 +132,7 @@ func RedisDelDataRedis(messageId string, redisKey string) bool {
 	return result
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func RedisDelKeysWithPatternRedis(messageId string, redisKeyPattern string) bool {
 	// RedisPooler need to be initiated in caller function
 	redisConn := RedisPooler.Get()
