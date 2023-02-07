@@ -1,0 +1,145 @@
+{
+	"info": {
+		"_postman_id": "fa70caf3-74a2-4c88-a0de-8cebf421f941",
+		"name": "Billing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13137671"
+	},
+	"item": [
+		{
+			"name": "localhost:31234/send",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"dataid\":\"HITI4001\",\r\n    \"formulaid\": \"RUMIPENDY466HITI40\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"data1\": \"Chandra\",\r\n    \"data2\": \"Tangerang\",\r\n    \"data3\": \"Kopi Hitam\",\r\n    \"data4\": \"8\",\r\n    \"data5\": \"6000.5\",\r\n    \"data6\": \"\",\r\n    \"data7\": \"\",\r\n    \"data8\": \"\",\r\n    \"data9\": \"\",\r\n    \"data10\": \"\",\r\n    \"data11\": \"\",\r\n    \"data12\": \"\",\r\n    \"data13\": \"\",\r\n    \"data14\": \"\",\r\n    \"data15\": \"\",\r\n    \"data16\": \"\",\r\n    \"data17\": \"\",\r\n    \"data18\": \"\",\r\n    \"data19\": \"\",\r\n    \"data20\": \"\",\r\n    \"data21\": \"\",\r\n    \"data22\": \"\",\r\n    \"data23\": \"\",\r\n    \"data24\": \"\",\r\n    \"data25\": \"\",\r\n    \"data26\": \"\",\r\n    \"data27\": \"\",\r\n    \"data28\": \"\",\r\n    \"data29\": \"\",\r\n    \"data30\": \"\",\r\n    \"data31\": \"\",\r\n    \"data32\": \"\",\r\n    \"data33\": \"\",\r\n    \"data34\": \"\",\r\n    \"data35\": \"\",\r\n    \"data36\": \"\",\r\n    \"data37\": \"\",\r\n    \"data38\": \"\",\r\n    \"data39\": \"\",\r\n    \"data40\": \"\",\r\n    \"data41\": \"\",\r\n    \"data42\": \"\",\r\n    \"data43\": \"\",\r\n    \"data44\": \"\",\r\n    \"data45\": \"\",\r\n    \"data46\": \"\",\r\n    \"data47\": \"\",\r\n    \"data48\": \"\",\r\n    \"data49\": \"\",\r\n    \"data50\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:31234/send",
+					"host": [
+						"localhost"
+					],
+					"port": "31234",
+					"path": [
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:31234/send V2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"datas\": [\r\n        {\r\n            \"nama\": \"Fadhil\",\r\n            \"cabang\": \"Bandung\",\r\n            \"barang\": \"Caramel\",\r\n            \"jumlah\": \"3\",\r\n            \"harga\": \"9000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Hila\",\r\n            \"cabang\": \"Jakarta\",\r\n            \"barang\": \"Latte\",\r\n            \"jumlah\": \"7\",\r\n            \"harga\": \"7500.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Alfo\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Teh Ceri\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"7000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Chandra\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Vivo\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"12000.5\"\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:31234/send",
+					"host": [
+						"localhost"
+					],
+					"port": "31234",
+					"path": [
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:31122/formula",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi40\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"par1\": \"nama\",\r\n    \"par2\": \"cabang\",\r\n    \"par3\": \"barang\",\r\n    \"par4\": \"jumlah\",\r\n    \"par5\": \"harga\",\r\n    \"par6\": \"total\",\r\n    \"par7\": \"fee\",\r\n    \"par8\": \"totalpenjualan\",\r\n    \"par9\": \"totalfee\",\r\n    \"par10\": \"\",\r\n    \"par11\": \"\",\r\n    \"par12\": \"\",\r\n    \"par13\": \"\",\r\n    \"par14\": \"\",\r\n    \"par15\": \"\",\r\n    \"par16\": \"\",\r\n    \"par17\": \"\",\r\n    \"par18\": \"\",\r\n    \"par19\": \"\",\r\n    \"par20\": \"\",\r\n    \"par21\": \"\",\r\n    \"par22\": \"\",\r\n    \"par23\": \"\",\r\n    \"par24\": \"\",\r\n    \"par25\": \"\",\r\n    \"par26\": \"\",\r\n    \"par27\": \"\",\r\n    \"par28\": \"\",\r\n    \"par29\": \"\",\r\n    \"par30\": \"\",\r\n    \"par31\": \"\",\r\n    \"par32\": \"\",\r\n    \"par33\": \"\",\r\n    \"par34\": \"\",\r\n    \"par35\": \"\",\r\n    \"par36\": \"\",\r\n    \"par37\": \"\",\r\n    \"par38\": \"\",\r\n    \"par39\": \"\",\r\n    \"par40\": \"\",\r\n    \"par41\": \"\",\r\n    \"par42\": \"\",\r\n    \"par43\": \"\",\r\n    \"par44\": \"\",\r\n    \"par45\": \"\",\r\n    \"par46\": \"\",\r\n    \"par47\": \"\",\r\n    \"par48\": \"\",\r\n    \"par49\": \"\",\r\n    \"par50\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:31122/formula",
+					"host": [
+						"localhost"
+					],
+					"port": "31122",
+					"path": [
+						"formula"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:31122/formula V2",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi20\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"fields\": {\r\n        \"par1\": \"nama\",\r\n        \"par2\": \"cabang\",\r\n        \"par3\": \"barang\",\r\n        \"par4\": \"jumlah\",\r\n        \"par5\": \"harga\",\r\n        \"par6\": \"total\",\r\n        \"par7\": \"fee\",\r\n        \"par8\": \"totalpenjualan\",\r\n        \"par9\": \"totalfee\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:31122/formula",
+					"host": [
+						"localhost"
+					],
+					"port": "31122",
+					"path": [
+						"formula"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:31122/formula V3",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi80\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:31122/formula",
+					"host": [
+						"localhost"
+					],
+					"port": "31122",
+					"path": [
+						"formula"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
