@@ -54,7 +54,6 @@ func saveToDatabase(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCo
 	return isSuccess
 }
 
-
 func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
 
@@ -71,7 +70,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 	modules.DoLog("INFO", incTraceCode, "API", "Auth",
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
-	if len(mapIncoming) > 0  {
+	if len(mapIncoming) > 0 {
 
 		modules.DoLog("INFO", incTraceCode, "API", "Auth",
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
@@ -117,4 +116,3 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 	return incTraceCode, responseHeader, responseContent
 }
-

@@ -54,7 +54,6 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 	return isSuccess, incGroupID
 }
 
-
 func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
 
@@ -71,7 +70,7 @@ func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, in
 	modules.DoLog("INFO", incTraceCode, "API", "Auth",
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
-	if len(mapIncoming) > 0  {
+	if len(mapIncoming) > 0 {
 
 		modules.DoLog("INFO", incTraceCode, "API", "Auth",
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
@@ -118,4 +117,3 @@ func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, in
 
 	return incTraceCode, responseHeader, responseContent
 }
-

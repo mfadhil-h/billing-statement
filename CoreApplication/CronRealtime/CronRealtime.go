@@ -2,7 +2,6 @@ package main
 
 import (
 	"billing/Config"
-	"billing/CoreApplication/CronRealtime/CronProcessed"
 	"billing/modules"
 	"context"
 	"database/sql"
@@ -11,49 +10,39 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/now"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"runtime"
 	"strings"
 	"time"
 )
 
+/* ReloadFormulaToRedis func in test.go */
 func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 
-	var arrF [50]string
-	var arrC []string
-
-	query := "SELECT f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, " +
-		"f11, f12, f13, f14, f15, f16, f17, f18, f19, f20," +
-		"f21, f22, f23, f24, f25, f26, f27, f28, f29, f30," +
-		"f31, f32, f33, f34, f35, f36, f37, f38, f39, f40," +
-		"f41, f42, f43, f44, f45, f46, f47, f48, f49, f50," +
-		"formula, client_id, formula_id, formula_type, formula_time " +
-		"FROM yformula WHERE is_active = true"
+	query := `SELECT formula, client_id, formula_id, formula_type, formula_time FROM yformula_v3
+        WHERE is_active = true`
 
 	rows, err := db.Query(query)
 
 	if err != nil {
 		fmt.Println("FAILED : ", err)
 	} else {
-		arrC, _ = rows.Columns()
-
 		for rows.Next() {
-			var rawF [50]sql.NullString
 			var rawFormula sql.NullString
 			var rawClientID sql.NullString
 			var rawFormulaID sql.NullString
 			var rawType sql.NullString
 			var rawTime sql.NullTime
 
-			errP := rows.Scan(&rawF[0], &rawF[1], &rawF[2], &rawF[3], &rawF[4], &rawF[5], &rawF[6], &rawF[7], &rawF[8], &rawF[9], &rawF[10],
-				&rawF[11], &rawF[12], &rawF[13], &rawF[14], &rawF[15], &rawF[16], &rawF[17], &rawF[18], &rawF[19], &rawF[20],
-				&rawF[21], &rawF[22], &rawF[23], &rawF[24], &rawF[25], &rawF[26], &rawF[27], &rawF[28], &rawF[29], &rawF[30],
-				&rawF[31], &rawF[32], &rawF[33], &rawF[34], &rawF[35], &rawF[36], &rawF[37], &rawF[38], &rawF[39], &rawF[40],
-				&rawF[41], &rawF[42], &rawF[43], &rawF[44], &rawF[45], &rawF[46], &rawF[47], &rawF[48], &rawF[49],
-				&rawFormula, &rawClientID, &rawFormulaID, &rawType, &rawTime)
+			errP := rows.Scan(&rawFormula, &rawClientID, &rawFormulaID, &rawType, &rawTime)
 
 			if errP != nil {
 				fmt.Println("FAILED : ", errP)
 			} else {
+				//strFields := modules.ConvertSQLNullStringToString(rawFields)
+				//mapFields := modules.ConvertJSONStringToMap("", strFields)
 				strFormula := ""
 				strFormula = modules.ConvertSQLNullStringToString(rawFormula)
 				strClientID := modules.ConvertSQLNullStringToString(rawClientID)
@@ -63,14 +52,7 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 				if rawTime.Valid {
 					strTime = modules.DoFormatDateTime("HH:mm", rawTime.Time)
 				}
-
-				//for x := 0; x < len(arrF); x++ {
-				for x := len(arrF) - 1; x >= 0; x-- {
-					arrF[x] = modules.ConvertSQLNullStringToString(rawF[x])
-					if len(arrF[x]) > 0 {
-						strFormula = strings.Replace(strFormula, arrF[x], arrC[x], -1)
-					}
-				}
+				println("strFormula: " + strFormula)
 
 				var strInsertAsResult []string
 				var strInsertAsFormula []string
@@ -191,6 +173,7 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 	}
 }
 
+/* Not to change if test.go change */
 func readRedisFormula(rc *redis.Client, cx context.Context) {
 
 	incTraceCode := modules.GenerateUUID()
@@ -231,32 +214,38 @@ func readRedisFormula(rc *redis.Client, cx context.Context) {
 
 				if strings.ToUpper(strType) == "DAY" && refTimeNow == strTime {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(fmt.Sprintf("%s", refDayName)) == strings.ToUpper(strType) && refTimeNow == strTime {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "STARTMONTH" && refStartMonth == refDateNow && refTimeNow == strTime {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "ENDMONTH" && refEndMonth == refDateNow && refTimeNow == strTime {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == refDayNow && refTimeNow == strTime {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 
 				if strings.ToUpper(strType) == "REALTIME" {
 					fmt.Println(strFormulaID, strType, strTime)
-					CronProcessed.GetData(db, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
+					/* Get Formula func in test.go (Originally GetData func) */
+					modules.GetFormula(dbPostgres, dbMongo, rc, cx, incTraceCode, strClient, strFormulaID, arrRedis[x])
 				}
 			}
 		}
@@ -265,7 +254,8 @@ func readRedisFormula(rc *redis.Client, cx context.Context) {
 
 const processType = "REALTIME"
 
-var db *sql.DB
+var dbPostgres *sql.DB
+var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
@@ -280,7 +270,7 @@ func main() {
 		modules.MapConfig["databaseHost"], modules.MapConfig["databasePort"], modules.MapConfig["databaseUser"],
 		modules.MapConfig["databasePass"], modules.MapConfig["databaseName"])
 
-	db, errDB = sql.Open("postgres", psqlInfo) // db udah di defined diatas, jadi harus pake = bukan :=
+	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
 		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
@@ -288,21 +278,38 @@ func main() {
 		panic(errDB)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	dbPostgres.SetConnMaxLifetime(time.Minute * 10)
+	dbPostgres.SetMaxIdleConns(5)
+	dbPostgres.SetMaxOpenConns(50)
 
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
 			fmt.Println("Failed to close DB Connection.")
 		}
-	}(db)
+	}(dbPostgres)
 
-	errDB = db.Ping()
+	errDB = dbPostgres.Ping()
 	if errDB != nil {
 		panic(errDB)
 	}
+
+	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if errDB != nil {
+		panic(errDB)
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	errDB = client.Connect(ctx)
+	if errDB != nil {
+		panic(errDB)
+	}
+	defer client.Disconnect(ctx)
+	errDB = client.Ping(ctx, readpref.Primary())
+	if errDB != nil {
+		panic(errDB)
+	}
+
+	dbMongo = client.Database("billing_settlement")
 
 	// Initiate Redis
 	rc = modules.InitiateRedisClient()
@@ -316,8 +323,8 @@ func main() {
 
 	go func() {
 		for {
-			loadToRedis(db, rc, cx)
-			time.Sleep(3 * time.Second)
+			loadToRedis(dbPostgres, rc, cx)
+			time.Sleep(Config.ConstReloadToRedis * time.Second)
 		}
 	}()
 

@@ -1,9 +1,15 @@
 package modules
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go-redis/redis/v8"
+	"github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -143,7 +149,7 @@ func TransactionMgmtGetCallbackUrlAndMethod(messageId string, db *sql.DB) (strin
 	return callbackUrl, callbackMethod, clientId
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func TransactionMgmtGetTransactionDetail(messageId string, db *sql.DB) map[string]interface{} {
 	queryTransaction := "select transaction_date, msisdn, message, country_code, telecom_id, prefix, status_code, receiver_type, " +
 		"client_id, currency, message_encodng, message_length, sms_count, client_price_per_unit, client_price_total, " +
@@ -337,7 +343,7 @@ func TransactionMgmtGetTransactionDetailfromVendorMessageId(vendorMessageId stri
 	return strMessageId, mapDetailTransaction
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func TransactionMgmtUpdateTransactionStatus(messageId string, db *sql.DB, newTransactionStatus string) bool {
 	isUpdateSuccess := false
 
@@ -451,7 +457,7 @@ func TransactionMgmtUpdateTransactionStatusAndVoiceDuration(messageId string, db
 	return isUpdateSuccess
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func TransactionMgmtUpdateTransactionVendorStatus(messageId string, db *sql.DB, callbackDateTime time.Time, vendorCallback string, vendorTrxStatus string) {
 	queryUpdate := "update transaction_sms_vendor set vendor_callback_date_time = $1, vendor_callback = $2, vendor_trx_status = $3 where message_id = $4"
 
@@ -468,7 +474,7 @@ func TransactionMgmtUpdateTransactionVendorStatus(messageId string, db *sql.DB, 
 	}
 }
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func TransactionMgmtInsertIntoTransactionVendor(messageId string, db *sql.DB, vendorId string, vendorHitDateTime time.Time, vendorHitRequest string,
 	vendorHitRespDateTime time.Time, vendorHitResponse string, vendorMessageId string, vendorTrxStatus string) {
 	queryInsert := "INSERT INTO transaction_sms_vendor(message_id, vendor_id, vendor_hit_date_time, vendor_hit_request, " +
@@ -517,7 +523,38 @@ func GetMessageIdByVendorMessageId(db *sql.DB, vendorId string, vendorMessageId 
 	return messageId
 }
 
-//noinspection GoUnusedExportedFunction
+func GetDataIdByKeys(db *sql.DB, dataId string, formulaId string, clientId string) string {
+	messageId := ""
+
+	query := "select data_id from ytransaction_v2 where data_id = $1 and formula_id = $2 and client_id = $3"
+
+	rows, err := db.Query(query, dataId, formulaId, clientId)
+
+	if err != nil {
+		DoLog("INFO", messageId, "BlastMeTransactionManagement", "GetMessageIdByVendorMessageId",
+			"Failed to read result transaction. Error occured.", true, err)
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var dataMessageId sql.NullString
+
+			errScan := rows.Scan(&dataMessageId)
+
+			if errScan != nil {
+				// Failed to scan
+				DoLog("INFO", "", "BlastMeTransactionManagement", "GetMessageIdByVendorMessageId",
+					"Failed to scan transaction result. Error occured.", true, errScan)
+			} else {
+				messageId = ConvertSQLNullStringToString(dataMessageId)
+			}
+		}
+	}
+
+	return messageId
+}
+
+// noinspection GoUnusedExportedFunction
 func TransactionMgmtDeductBalance(messageId string, db *sql.DB, clientId string, deductionValue float64, lastUsageDateTime time.Time, lastUsageType string, lastUsageBy string) (bool, float64, float64, float64) {
 	isSuccess := false
 	prevBalance := 0.00
@@ -665,4 +702,286 @@ func TransactionMgmtInsertTransactionFinancial(messageId string, db *sql.DB, usa
 	}
 
 	return isSuccess
+}
+
+func SaveDataBillingIntoMongo(db *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) bool {
+
+	var incDatas []map[string]interface{}
+	//isSuccess := true
+
+	incClientID := GetStringFromMapInterface(mapIncoming, "clientid")
+	incFormulaID := GetStringFromMapInterface(mapIncoming, "formulaid")
+	collectionName := incClientID + "_" + incFormulaID
+	//incProcessID := modules.GenerateUUID()
+	incTimeNow := DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
+
+	//incDatas := mapIncoming["datas"].([]map[string]interface{})
+	rawDatas := mapIncoming["datas"].([]interface{})
+	for _, data := range rawDatas {
+		mapData := data.(map[string]interface{})
+		incDatas = append(incDatas, mapData)
+	}
+	names, err := db.ListCollectionNames(cx, bson.M{})
+	if err != nil {
+		return false
+	}
+	isCollExist := false
+	for _, name := range names {
+		if name == collectionName {
+			isCollExist = true
+			break
+		}
+	}
+	if !isCollExist {
+		command := bson.D{{"create", collectionName}}
+		var result bson.M
+		if errDB := db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
+			panic(errDB)
+		}
+	}
+	collection := db.Collection(collectionName)
+
+	for i, data := range incDatas {
+		incDataID := GetStringFromMapInterface(data, "dataid")
+		println(fmt.Sprintf("incDataID: %+v", incDataID))
+		if !(len(incDataID) > 0) {
+			count := i
+			if i > 10 {
+				count = i - 10
+			}
+			strCount := strconv.Itoa(count)
+			datemili := DoFormatDateTime("YY0M0DHHmmssS", time.Now())
+			incDataID = strings.ToUpper(incFormulaID) + "_DATA" + datemili + strCount
+			println(fmt.Sprintf("incDataID: %+v, datemili: %+v", incDataID, datemili))
+		}
+		data["data_id"] = incDataID
+		data["formula_id"] = incFormulaID
+		data["client_id"] = incClientID
+		data["data_receive_datetime"] = incTimeNow
+		one, errIns := collection.InsertOne(cx, data)
+		if errIns != nil {
+			return false
+		}
+		println(fmt.Sprintf("insert one: %+v", one))
+		//jsonData := modules.ConvertMapInterfaceToJSON(data)
+
+	}
+	return true
+}
+
+func SaveFormulaBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string) {
+
+	isSuccess := false
+
+	incClientID := GetStringFromMapInterface(mapIncoming, "clientid")
+
+	//incFields := mapIncoming["fields"].(map[string]interface{})
+	//jsonFields := modules.ConvertMapInterfaceToJSON(incFields)
+
+	incFields := mapIncoming["fields"].(interface{})
+
+	//incField1 := modules.GetStringFromMapInterface(mapIncoming, "par1")
+	//incField2 := modules.GetStringFromMapInterface(mapIncoming, "par2")
+	//incField3 := modules.GetStringFromMapInterface(mapIncoming, "par3")
+	//incField4 := modules.GetStringFromMapInterface(mapIncoming, "par4")
+	//incField5 := modules.GetStringFromMapInterface(mapIncoming, "par5")
+	//incField6 := modules.GetStringFromMapInterface(mapIncoming, "par6")
+	//incField7 := modules.GetStringFromMapInterface(mapIncoming, "par7")
+	//incField8 := modules.GetStringFromMapInterface(mapIncoming, "par8")
+	//incField9 := modules.GetStringFromMapInterface(mapIncoming, "par9")
+	//incField10 := modules.GetStringFromMapInterface(mapIncoming, "par10")
+	//
+	//incField11 := modules.GetStringFromMapInterface(mapIncoming, "par11")
+	//incField12 := modules.GetStringFromMapInterface(mapIncoming, "par12")
+	//incField13 := modules.GetStringFromMapInterface(mapIncoming, "par13")
+	//incField14 := modules.GetStringFromMapInterface(mapIncoming, "par14")
+	//incField15 := modules.GetStringFromMapInterface(mapIncoming, "par15")
+	//incField16 := modules.GetStringFromMapInterface(mapIncoming, "par16")
+	//incField17 := modules.GetStringFromMapInterface(mapIncoming, "par17")
+	//incField18 := modules.GetStringFromMapInterface(mapIncoming, "par18")
+	//incField19 := modules.GetStringFromMapInterface(mapIncoming, "par19")
+	//incField20 := modules.GetStringFromMapInterface(mapIncoming, "par20")
+	//
+	//incField21 := modules.GetStringFromMapInterface(mapIncoming, "par21")
+	//incField22 := modules.GetStringFromMapInterface(mapIncoming, "par22")
+	//incField23 := modules.GetStringFromMapInterface(mapIncoming, "par23")
+	//incField24 := modules.GetStringFromMapInterface(mapIncoming, "par24")
+	//incField25 := modules.GetStringFromMapInterface(mapIncoming, "par25")
+	//incField26 := modules.GetStringFromMapInterface(mapIncoming, "par26")
+	//incField27 := modules.GetStringFromMapInterface(mapIncoming, "par27")
+	//incField28 := modules.GetStringFromMapInterface(mapIncoming, "par28")
+	//incField29 := modules.GetStringFromMapInterface(mapIncoming, "par29")
+	//incField30 := modules.GetStringFromMapInterface(mapIncoming, "par30")
+	//
+	//incField31 := modules.GetStringFromMapInterface(mapIncoming, "par31")
+	//incField32 := modules.GetStringFromMapInterface(mapIncoming, "par32")
+	//incField33 := modules.GetStringFromMapInterface(mapIncoming, "par33")
+	//incField34 := modules.GetStringFromMapInterface(mapIncoming, "par34")
+	//incField35 := modules.GetStringFromMapInterface(mapIncoming, "par35")
+	//incField36 := modules.GetStringFromMapInterface(mapIncoming, "par36")
+	//incField37 := modules.GetStringFromMapInterface(mapIncoming, "par37")
+	//incField38 := modules.GetStringFromMapInterface(mapIncoming, "par38")
+	//incField39 := modules.GetStringFromMapInterface(mapIncoming, "par39")
+	//incField40 := modules.GetStringFromMapInterface(mapIncoming, "par40")
+	//
+	//incField41 := modules.GetStringFromMapInterface(mapIncoming, "par41")
+	//incField42 := modules.GetStringFromMapInterface(mapIncoming, "par42")
+	//incField43 := modules.GetStringFromMapInterface(mapIncoming, "par43")
+	//incField44 := modules.GetStringFromMapInterface(mapIncoming, "par44")
+	//incField45 := modules.GetStringFromMapInterface(mapIncoming, "par45")
+	//incField46 := modules.GetStringFromMapInterface(mapIncoming, "par46")
+	//incField47 := modules.GetStringFromMapInterface(mapIncoming, "par47")
+	//incField48 := modules.GetStringFromMapInterface(mapIncoming, "par48")
+	//incField49 := modules.GetStringFromMapInterface(mapIncoming, "par49")
+	//incField50 := modules.GetStringFromMapInterface(mapIncoming, "par50")
+
+	incFormula := GetStringFromMapInterface(mapIncoming, "formula")
+	incFormulaName := GetStringFromMapInterface(mapIncoming, "name")
+	incType := GetStringFromMapInterface(mapIncoming, "type")
+	incTime := GetStringFromMapInterface(mapIncoming, "time")
+	incFormulaID := GenerateFormulaID(incClientID, incFormulaName)
+	incTimeNow := DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
+
+	if strings.ToUpper(incType) == "REALTIME" {
+		incTime = "00:00"
+	}
+
+	//query := `INSERT INTO yformula (formula_id, client_id, formula_name,
+	//	f1, f2, f3, f4, f5, f6, f7, f8, f9, f10,
+	//    f11, f12, f13, f14, f15, f16, f17, f18, f19, f20,
+	//    f21, f22, f23, f24, f25, f26, f27, f28, f29, f30,
+	//    f31, f32, f33, f34, f35, f36, f37, f38, f39, f40,
+	//    f41, f42, f43, f44, f45, f46, f47, f48, f49, f50,
+	//    formula, formula_type, formula_time, formula_create_datetime, is_active)
+	//	VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,
+	//	$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,$54,
+	//	$55,$56,$57,$58)`
+
+	//result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName,
+	//	incField1, incField2, incField3, incField4, incField5, incField6, incField7, incField8, incField9, incField10,
+	//	incField11, incField12, incField13, incField14, incField15, incField16, incField17, incField18, incField19, incField20,
+	//	incField21, incField22, incField23, incField24, incField25, incField26, incField27, incField28, incField29, incField30,
+	//	incField31, incField32, incField33, incField34, incField35, incField36, incField37, incField38, incField39, incField40,
+	//	incField41, incField42, incField43, incField44, incField45, incField46, incField47, incField48, incField49, incField50,
+	//	incFormula, incType, incTime, incTimeNow, true)
+
+	query := `INSERT INTO yformula_v3 (formula_id, client_id, formula_name,	fields, formula, formula_type, formula_time,
+        formula_create_datetime, is_active) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
+
+	result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName, pq.Array(incFields),
+		incFormula, incType, incTime, incTimeNow, true)
+
+	if err != nil {
+		DoLog("ERROR", incTraceCode, "API", "Formula",
+			"Failed to insert tables. Error occur.", true, err)
+	} else {
+		// Success
+		rowAffected, _ := result.RowsAffected()
+		if rowAffected >= 0 {
+			isSuccess = true
+			DoLog("INFO", incTraceCode, "API", "Formula",
+				"Success to insert tables.", true, nil)
+		} else {
+			isSuccess = false
+			DoLog("ERROR", incTraceCode, "API", "Formula",
+				"Failed to insert tables. Error occur.", true, err)
+		}
+	}
+	return isSuccess, incFormulaID
+}
+
+func GetSUM(incFormula string, mapDatas []map[string]interface{}) float64 {
+	fltResult := 0.0
+
+	rawFormula := strings.ToUpper(incFormula)
+
+	rawFormula = strings.Replace(rawFormula, "SUM", "", -1)
+	rawFormula = strings.Replace(rawFormula, "(", "", -1)
+	rawFormula = strings.Replace(rawFormula, ")", "", -1)
+	rawFormula = strings.ToLower(rawFormula)
+
+	for _, mapData := range mapDatas {
+		fltResult += mapData[rawFormula].(float64)
+	}
+
+	return fltResult
+}
+
+func GetAVG(incFormula string, mapDatas []map[string]interface{}) float64 {
+	fltResult := 0.0
+	fltTotal := 0.0
+
+	rawFormula := strings.ToUpper(incFormula)
+
+	rawFormula = strings.Replace(rawFormula, "AVG", "", -1)
+	rawFormula = strings.Replace(rawFormula, "(", "", -1)
+	rawFormula = strings.Replace(rawFormula, ")", "", -1)
+	rawFormula = strings.ToLower(rawFormula)
+
+	for _, mapData := range mapDatas {
+		fltResult += mapData[rawFormula].(float64)
+		fltTotal += 1
+	}
+	fltResult = fltResult / fltTotal
+
+	return fltResult
+}
+
+func GetCOUNT(incFormula string, mapDatas []map[string]interface{}) float64 {
+	fltResult := 0.0
+
+	rawFormula := strings.ToUpper(incFormula)
+
+	rawFormula = strings.Replace(rawFormula, "COUNT", "", -1)
+	rawFormula = strings.Replace(rawFormula, "(", "", -1)
+	rawFormula = strings.Replace(rawFormula, ")", "", -1)
+	rawFormula = strings.ToLower(rawFormula)
+
+	for _, mapData := range mapDatas {
+		if mapData[rawFormula].(float64) > 0 {
+			fltResult += 1
+		}
+	}
+
+	return fltResult
+}
+
+func GetMAX(incFormula string, mapDatas []map[string]interface{}) float64 {
+	fltResult := 0.0
+
+	rawFormula := strings.ToUpper(incFormula)
+
+	rawFormula = strings.Replace(rawFormula, "MAX", "", -1)
+	rawFormula = strings.Replace(rawFormula, "(", "", -1)
+	rawFormula = strings.Replace(rawFormula, ")", "", -1)
+	rawFormula = strings.ToLower(rawFormula)
+
+	max := 0.0
+	for _, mapData := range mapDatas {
+		if mapData[rawFormula].(float64) > max {
+			max = mapData[rawFormula].(float64)
+		}
+	}
+
+	return fltResult
+}
+
+func GetMIN(incFormula string, mapDatas []map[string]interface{}) float64 {
+	fltResult := 0.0
+
+	rawFormula := strings.ToUpper(incFormula)
+
+	rawFormula = strings.Replace(rawFormula, "MIN", "", -1)
+	rawFormula = strings.Replace(rawFormula, "(", "", -1)
+	rawFormula = strings.Replace(rawFormula, ")", "", -1)
+	rawFormula = strings.ToLower(rawFormula)
+
+	min := 0.0
+	for _, mapData := range mapDatas {
+		if mapData[rawFormula].(float64) < min {
+			min = mapData[rawFormula].(float64)
+		}
+	}
+
+	return fltResult
 }

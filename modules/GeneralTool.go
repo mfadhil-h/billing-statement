@@ -882,6 +882,14 @@ func TrimStringLength(theString string, length int) string {
 	return hasil
 }
 
+func ConvertSQLNullTimeToTime(theNullTime sql.NullTime) time.Time {
+	if theNullTime.Valid == true {
+		return theNullTime.Time
+	} else {
+		return time.Now()
+	}
+}
+
 func ConvertSQLNullStringToString(sqlNullString sql.NullString) string {
 	if sqlNullString.Valid == true {
 		return sqlNullString.String
