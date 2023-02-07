@@ -17,7 +17,6 @@ import (
 	"time"
 )
 
-
 func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 
 	var arrField [20]string
@@ -76,7 +75,7 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 				jsonRedis := modules.ConvertMapInterfaceToJSON(mapRedis)
 
 				redisKey := processType + "_" + Config.ConstRedisKey + strFormulaID
-				errR := modules.RedisSet(rc, cx, redisKey, jsonRedis, 5 * time.Second)
+				errR := modules.RedisSet(rc, cx, redisKey, jsonRedis, 5*time.Second)
 				if errR == nil {
 					fmt.Println("Success load : ", strFormulaID)
 				} else {
@@ -150,6 +149,7 @@ func readRedisFormula(rc *redis.Client, cx context.Context) {
 }
 
 const processType = "REALTIME"
+
 var db *sql.DB
 var rc *redis.Client
 var cx context.Context

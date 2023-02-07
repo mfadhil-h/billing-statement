@@ -2,7 +2,7 @@ package main
 
 import (
 	"billing/Config"
-	"billing/CoreApplication/Cron/CronProcessed"
+	"billing/CoreApplication/CronOldVersion/CronProcessed"
 	"billing/modules"
 	"context"
 	"database/sql"
