@@ -5,7 +5,7 @@
 -- Dumped from database version 14.2
 -- Dumped by pg_dump version 14.2
 
--- Started on 2023-01-26 04:46:09
+-- Started on 2023-02-08 04:25:23
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -29,7 +29,7 @@ CREATE SCHEMA public;
 ALTER SCHEMA public OWNER TO postgres;
 
 --
--- TOC entry 3404 (class 0 OID 0)
+-- TOC entry 3461 (class 0 OID 0)
 -- Dependencies: 3
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
 --
@@ -216,6 +216,25 @@ CREATE TABLE public.data (
 ALTER TABLE public.data OWNER TO postgres;
 
 --
+-- TOC entry 226 (class 1259 OID 30876)
+-- Name: excel_upload; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.excel_upload (
+    batch_id character varying NOT NULL,
+    client_id character varying,
+    formula_name character varying,
+    formulas text,
+    path_file_name character varying,
+    created_date timestamp without time zone,
+    schedule_type character varying,
+    schedule timestamp without time zone
+);
+
+
+ALTER TABLE public.excel_upload OWNER TO postgres;
+
+--
 -- TOC entry 212 (class 1259 OID 29818)
 -- Name: formula; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -309,6 +328,155 @@ CREATE TABLE public.groups (
 
 
 ALTER TABLE public.groups OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 30908)
+-- Name: hospital_product; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hospital_product (
+    product_id character varying,
+    nama character varying,
+    price character varying,
+    using_enum character varying,
+    category_id character varying,
+    description text,
+    dose character varying,
+    netto character varying,
+    size character varying,
+    total_weight character varying
+);
+
+
+ALTER TABLE public.hospital_product OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 30913)
+-- Name: hospital_product_category; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hospital_product_category (
+    id character varying,
+    name character varying
+);
+
+
+ALTER TABLE public.hospital_product_category OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 30921)
+-- Name: hospital_product_transaction; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hospital_product_transaction (
+);
+
+
+ALTER TABLE public.hospital_product_transaction OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 30918)
+-- Name: hospital_service; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hospital_service (
+);
+
+
+ALTER TABLE public.hospital_service OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 30924)
+-- Name: hospital_service_transaction; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hospital_service_transaction (
+    id character varying,
+    trx_date timestamp without time zone,
+    start_consul character varying,
+    end_consul character varying,
+    patient_name character varying,
+    diagnosa character varying,
+    product_ids character varying[]
+);
+
+
+ALTER TABLE public.hospital_service_transaction OWNER TO postgres;
+
+--
+-- TOC entry 230 (class 1259 OID 30898)
+-- Name: master_employee; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.master_employee (
+    nama character varying,
+    operasional_hour character varying,
+    salary character varying,
+    tax character varying,
+    bonus character varying,
+    total_salary character varying,
+    role_id character varying,
+    id character varying,
+    fee_percent integer
+);
+
+
+ALTER TABLE public.master_employee OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 30903)
+-- Name: master_industry; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.master_industry (
+    id character varying,
+    name character varying
+);
+
+
+ALTER TABLE public.master_industry OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 30883)
+-- Name: master_product; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.master_product (
+    id integer,
+    name character varying,
+    industry_id character varying
+);
+
+
+ALTER TABLE public.master_product OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 30893)
+-- Name: master_role; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.master_role (
+    id character varying,
+    nama character varying
+);
+
+
+ALTER TABLE public.master_role OWNER TO postgres;
+
+--
+-- TOC entry 228 (class 1259 OID 30888)
+-- Name: master_service; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.master_service (
+    id character varying,
+    price character varying,
+    employee_id character varying,
+    industry_id character varying
+);
+
+
+ALTER TABLE public.master_service OWNER TO postgres;
 
 --
 -- TOC entry 213 (class 1259 OID 29823)
@@ -678,7 +846,7 @@ CREATE TABLE public.ytransaction_v2 (
 ALTER TABLE public.ytransaction_v2 OWNER TO postgres;
 
 --
--- TOC entry 3382 (class 0 OID 29803)
+-- TOC entry 3428 (class 0 OID 29803)
 -- Dependencies: 209
 -- Data for Name: Xdata; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -690,7 +858,7 @@ DATA002	CLI001	FOR001	15000.00000	5.00000	1000.00000	75000.00000	304000.00000	\N
 
 
 --
--- TOC entry 3383 (class 0 OID 29808)
+-- TOC entry 3429 (class 0 OID 29808)
 -- Dependencies: 210
 -- Data for Name: Xformula; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -701,7 +869,7 @@ FOR001	CLI001	Test	hargabarang	jumlahbarang	biayaadmin	hasil1	hasil2	hasil3	hasi
 
 
 --
--- TOC entry 3393 (class 0 OID 30797)
+-- TOC entry 3439 (class 0 OID 30797)
 -- Dependencies: 220
 -- Data for Name: client; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -714,7 +882,7 @@ RUMNG1NDQ442	MERATINDUW450	RUMARASA RECIPE CABANG 1	Jakarta	Mampang	ID			IDR	Alf
 
 
 --
--- TOC entry 3384 (class 0 OID 29813)
+-- TOC entry 3430 (class 0 OID 29813)
 -- Dependencies: 211
 -- Data for Name: data; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -727,7 +895,17 @@ DATA003	CLI001	FOR002	a28c94fd045e45ecbb42567a98fa28ba	1.00000	2.00000	3.00000	6
 
 
 --
--- TOC entry 3385 (class 0 OID 29818)
+-- TOC entry 3445 (class 0 OID 30876)
+-- Dependencies: 226
+-- Data for Name: excel_upload; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.excel_upload (batch_id, client_id, formula_name, formulas, path_file_name, created_date, schedule_type, schedule) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3431 (class 0 OID 29818)
 -- Dependencies: 212
 -- Data for Name: formula; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -739,7 +917,7 @@ FOR002	CLI001	Test 2	pertama	kedua	ketiga	hasil1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\
 
 
 --
--- TOC entry 3391 (class 0 OID 30787)
+-- TOC entry 3437 (class 0 OID 30787)
 -- Dependencies: 218
 -- Data for Name: groups; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -751,7 +929,107 @@ MERATINDUW450	MERDEKA ATAU MATI	Jakarta	Mampang	ID			IDR	Alfo	alfo.pratomo@gmail
 
 
 --
--- TOC entry 3386 (class 0 OID 29823)
+-- TOC entry 3451 (class 0 OID 30908)
+-- Dependencies: 232
+-- Data for Name: hospital_product; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hospital_product (product_id, nama, price, using_enum, category_id, description, dose, netto, size, total_weight) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3452 (class 0 OID 30913)
+-- Dependencies: 233
+-- Data for Name: hospital_product_category; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hospital_product_category (id, name) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3454 (class 0 OID 30921)
+-- Dependencies: 235
+-- Data for Name: hospital_product_transaction; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hospital_product_transaction  FROM stdin;
+\.
+
+
+--
+-- TOC entry 3453 (class 0 OID 30918)
+-- Dependencies: 234
+-- Data for Name: hospital_service; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hospital_service  FROM stdin;
+\.
+
+
+--
+-- TOC entry 3455 (class 0 OID 30924)
+-- Dependencies: 236
+-- Data for Name: hospital_service_transaction; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hospital_service_transaction (id, trx_date, start_consul, end_consul, patient_name, diagnosa, product_ids) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3449 (class 0 OID 30898)
+-- Dependencies: 230
+-- Data for Name: master_employee; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.master_employee (nama, operasional_hour, salary, tax, bonus, total_salary, role_id, id, fee_percent) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3450 (class 0 OID 30903)
+-- Dependencies: 231
+-- Data for Name: master_industry; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.master_industry (id, name) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3446 (class 0 OID 30883)
+-- Dependencies: 227
+-- Data for Name: master_product; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.master_product (id, name, industry_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3448 (class 0 OID 30893)
+-- Dependencies: 229
+-- Data for Name: master_role; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.master_role (id, nama) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3447 (class 0 OID 30888)
+-- Dependencies: 228
+-- Data for Name: master_service; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.master_service (id, price, employee_id, industry_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 3432 (class 0 OID 29823)
 -- Dependencies: 213
 -- Data for Name: result; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -761,7 +1039,7 @@ COPY public.result (data_id, transaction_id, client_id, formula_id, result, resu
 
 
 --
--- TOC entry 3390 (class 0 OID 30782)
+-- TOC entry 3436 (class 0 OID 30782)
 -- Dependencies: 217
 -- Data for Name: user_api; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -774,7 +1052,7 @@ RUMIPENDY466RUMEWU	RUMIPENDY466	RUMIPEZSoupsRrLeWU	HljS4E7Bsu1HUxlTVA1xAQc4T	6e8
 
 
 --
--- TOC entry 3392 (class 0 OID 30792)
+-- TOC entry 3438 (class 0 OID 30792)
 -- Dependencies: 219
 -- Data for Name: user_web; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -784,7 +1062,7 @@ COPY public.user_web (web_id, client_id, web_username, web_password, web_type, w
 
 
 --
--- TOC entry 3387 (class 0 OID 29828)
+-- TOC entry 3433 (class 0 OID 29828)
 -- Dependencies: 214
 -- Data for Name: ydata; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -802,7 +1080,7 @@ HITJAK001	RUMIPENDY466	RUMIPENDY466HITJAK	951c36171a014a8fbfefb69b3d9c337f	Fadhi
 
 
 --
--- TOC entry 3396 (class 0 OID 30855)
+-- TOC entry 3442 (class 0 OID 30855)
 -- Dependencies: 223
 -- Data for Name: ydata_v2; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -814,7 +1092,7 @@ DATA002	RUMIPENDY466	RUMIPENDY466HITI40	400f52de17b94053b2f43ad5aaf267c5	{"nama"
 
 
 --
--- TOC entry 3397 (class 0 OID 30860)
+-- TOC entry 3443 (class 0 OID 30860)
 -- Dependencies: 224
 -- Data for Name: ydata_v3; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -824,7 +1102,7 @@ COPY public.ydata_v3 (data_id, client_id, formula_id, process_id, datas, data_re
 
 
 --
--- TOC entry 3388 (class 0 OID 29833)
+-- TOC entry 3434 (class 0 OID 29833)
 -- Dependencies: 215
 -- Data for Name: yformula; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -839,7 +1117,7 @@ RUMIPENDY466HITI30	RUMIPENDY466	hitungpajakversi30	nama	cabang	barang	jumlah	har
 
 
 --
--- TOC entry 3394 (class 0 OID 30835)
+-- TOC entry 3440 (class 0 OID 30835)
 -- Dependencies: 221
 -- Data for Name: yformula_v2; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -850,7 +1128,7 @@ RUMIPENDY466HITI40	RUMIPENDY466	hitungpajakversi40	{"par1": "nama", "par2": "cab
 
 
 --
--- TOC entry 3395 (class 0 OID 30840)
+-- TOC entry 3441 (class 0 OID 30840)
 -- Dependencies: 222
 -- Data for Name: yformula_v3; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -858,11 +1136,13 @@ RUMIPENDY466HITI40	RUMIPENDY466	hitungpajakversi40	{"par1": "nama", "par2": "cab
 COPY public.yformula_v3 (formula_id, client_id, formula_name, fields, formula, formula_type, formula_time, formula_create_datetime, formula_update_datetime, is_active) FROM stdin;
 RUMIPENDY466HITI40	RUMIPENDY466	hitungpajakversi40	{nama,cabang,barang,jumlah,harga,total,fee,totalpenjualan,totalfee}	@string: nama@\n@string: cabang@\n@string: barang@\n@formula: total = jumlah * harga@\n@formula: fee  = total * 10 / 100@\n@formula: totalpenjualan = SUM(total)@\n@formula: totalfee = SUM(fee)@\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\n@outputdatagroup: nama asc, cabang asc, barang asc@\n@outputrecapgroup: totalpenjualan@\n@outputrecapgroup: totalfee@	REALTIME	00:00:00	2023-01-24 14:53:44.662	\N	t
 RUMIPENDY466HITI20	RUMIPENDY466	hitungpajakversi20	{nama,cabang,barang,jumlah,harga,total,fee,totalpenjualan,totalfee}	@string: nama@\n@string: cabang@\n@string: barang@\n@formula: total = jumlah * harga@\n@formula: fee  = total * 10 / 100@\n@formula: totalpenjualan = SUM(total)@\n@formula: totalfee = SUM(fee)@\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\n@outputdatagroup: nama asc, cabang asc, barang asc@\n@outputrecapgroup: totalpenjualan@\n@outputrecapgroup: totalfee@	REALTIME	00:00:00	2023-01-24 18:10:25.767	\N	t
+RUMIPENDY466HITI50	RUMIPENDY466	hitungpajakversi50	{nama,cabang,barang,jumlah,harga,total,fee,totalpenjualan,totalfee}	@string: nama@\n@string: cabang@\n@string: barang@\n@formula: total = jumlah * harga@\n@formula: fee  = total * 10 / 100@\n@formula: totalpenjualan = SUM(total)@\n@formula: totalfee = SUM(fee)@\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\n@outputdatagroup: nama asc, cabang asc, barang asc@\n@outputrecapgroup: totalpenjualan@\n@outputrecapgroup: totalfee@	REALTIME	00:00:00	2023-02-01 15:45:28.527	\N	t
+RUMIPENDY466HITI80	RUMIPENDY466	hitungpajakversi80	{nama,cabang,barang,jumlah,harga,total,fee,totalpenjualan,totalfee}	@string: nama@\n@string: cabang@\n@string: barang@\n@formula: total = jumlah * harga@\n@formula: fee  = total * 10 / 100@\n@formula: totalpenjualan = SUM(total)@\n@formula: totalfee = SUM(fee)@\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\n@outputdatagroup: nama asc, cabang asc, barang asc@\n@outputrecapgroup: totalpenjualan@\n@outputrecapgroup: totalfee@	REALTIME	00:00:00	2023-02-01 18:05:55.942	\N	t
 \.
 
 
 --
--- TOC entry 3389 (class 0 OID 29838)
+-- TOC entry 3435 (class 0 OID 29838)
 -- Dependencies: 216
 -- Data for Name: ytransaction; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -17115,19 +17395,30 @@ HITI20001	RUMIPENDY466	RUMIPENDY466HITI20	415fdcdde1264d96a3aee2cbb79396d4	Hilar
 
 
 --
--- TOC entry 3398 (class 0 OID 30865)
+-- TOC entry 3444 (class 0 OID 30865)
 -- Dependencies: 225
 -- Data for Name: ytransaction_v2; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.ytransaction_v2 (data_id, client_id, formula_id, process_id, results, data_receive_datetime, data_process_datetime, data_receive_code, is_process) FROM stdin;
-DATA001	RUMIPENDY466	RUMIPENDY466HITI40	3a2a2d542a304069abb4ccb7381721e8	{"fee": 4800.4, "nama": "Chandra", "harga": 6000.5, "total": 48004, "barang": "Kopi Hitam", "cabang": "Tangerang", "dataid": "DATA001", "jumlah": 8, "totalfee": 19200.4, "processid": "3a2a2d542a304069abb4ccb7381721e8", "totalpenjualan": 192004}	2023-01-24 17:05:51.769	2023-01-26 04:30:09.473	incTraceCode	f
-DATA002	RUMIPENDY466	RUMIPENDY466HITI40	3a2a2d542a304069abb4ccb7381721e8	{"fee": 14400, "nama": "Chandra", "harga": 12000, "total": 144000, "barang": "Kondom", "cabang": "Tangerang", "dataid": "DATA002", "jumlah": 12, "totalfee": 19200.4, "processid": "3a2a2d542a304069abb4ccb7381721e8", "totalpenjualan": 192004}	2023-01-24 17:05:51.769	2023-01-26 04:30:09.475	incTraceCode	f
+RUMIPENDY466HITI20_DATA2302011622541	RUMIPENDY466	RUMIPENDY466HITI20	add330c6b1214355a10281b8743739dd	{"fee": 1600.1, "nama": "Fadhil", "harga": 8000.5, "total": 16001, "barang": "Caramel", "cabang": "Jakarta", "jumlah": 2, "totalfee": 6100.349999999999, "totalpenjualan": 61003.5}	2023-02-01 16:32:41.552	2023-02-01 16:32:41.56	8538b3a2ab434352a5a6f8dfdbfc1b72	f
+RUMIPENDY466HITI20_DATA2302011622542	RUMIPENDY466	RUMIPENDY466HITI20	add330c6b1214355a10281b8743739dd	{"fee": 3800.2, "nama": "Hila", "harga": 9500.5, "total": 38002, "barang": "Matcha", "cabang": "Bogor", "jumlah": 4, "totalfee": 6100.349999999999, "totalpenjualan": 61003.5}	2023-02-01 16:32:41.552	2023-02-01 16:32:41.564	8538b3a2ab434352a5a6f8dfdbfc1b72	f
+RUMIPENDY466HITI20_DATA2302011622543	RUMIPENDY466	RUMIPENDY466HITI20	add330c6b1214355a10281b8743739dd	{"fee": 700.05, "nama": "Alfo", "harga": 7000.5, "total": 7000.5, "barang": "Teh", "cabang": "Tangerang", "jumlah": 1, "totalfee": 6100.349999999999, "totalpenjualan": 61003.5}	2023-02-01 16:32:41.552	2023-02-01 16:32:41.564	8538b3a2ab434352a5a6f8dfdbfc1b72	f
+RUMIPENDY466HITI80_DATA2302011806496040	RUMIPENDY466	RUMIPENDY466HITI80	1a1cd4c1dada40ddb872e72da823bfd3	{"fee": 2700.15, "nama": "Fadhil", "harga": 9000.5, "total": 27001.5, "barang": "Caramel", "cabang": "Bandung", "jumlah": 3, "totalfee": 19351.1, "totalpenjualan": 193511}	2023-02-01 18:06:51.556	2023-02-01 18:06:51.567	46c12d5890bb4b3d9acdd9ffc2e360a8	f
+RUMIPENDY466HITI80_DATA2302011806496051	RUMIPENDY466	RUMIPENDY466HITI80	1a1cd4c1dada40ddb872e72da823bfd3	{"fee": 5250.35, "nama": "Hila", "harga": 7500.5, "total": 52503.5, "barang": "Latte", "cabang": "Jakarta", "jumlah": 7, "totalfee": 19351.1, "totalpenjualan": 193511}	2023-02-01 18:06:51.556	2023-02-01 18:06:51.571	46c12d5890bb4b3d9acdd9ffc2e360a8	f
+RUMIPENDY466HITI80_DATA2302011806496052	RUMIPENDY466	RUMIPENDY466HITI80	1a1cd4c1dada40ddb872e72da823bfd3	{"fee": 4200.3, "nama": "Alfo", "harga": 7000.5, "total": 42003, "barang": "Teh Ceri", "cabang": "Tangerang", "jumlah": 6, "totalfee": 19351.1, "totalpenjualan": 193511}	2023-02-01 18:06:51.556	2023-02-01 18:06:51.571	46c12d5890bb4b3d9acdd9ffc2e360a8	f
+RUMIPENDY466HITI80_DATA2302011806496063	RUMIPENDY466	RUMIPENDY466HITI80	1a1cd4c1dada40ddb872e72da823bfd3	{"fee": 7200.3, "nama": "Chandra", "harga": 12000.5, "total": 72003, "barang": "Vivo", "cabang": "Tangerang", "jumlah": 6, "totalfee": 19351.1, "totalpenjualan": 193511}	2023-02-01 18:06:51.556	2023-02-01 18:06:51.572	46c12d5890bb4b3d9acdd9ffc2e360a8	f
+RUMIPENDY466HITI40_DATA230201164853000	RUMIPENDY466	RUMIPENDY466HITI40	b0507b35095f4ea4b55de368ef71f42a	{"fee": 2700.15, "nama": "Fadhil", "harga": 9000.5, "total": 27001.5, "barang": "Caramel", "cabang": "Bandung", "jumlah": 3, "totalfee": 12150.8, "totalpenjualan": 121508}	2023-02-01 16:48:56.538	2023-02-01 16:48:56.546	c8a6a0e66f3e4351875533329692dc42	f
+RUMIPENDY466HITI40_DATA230201164853001	RUMIPENDY466	RUMIPENDY466HITI40	b0507b35095f4ea4b55de368ef71f42a	{"fee": 5250.35, "nama": "Hila", "harga": 7500.5, "total": 52503.5, "barang": "Latte", "cabang": "Jakarta", "jumlah": 7, "totalfee": 12150.8, "totalpenjualan": 121508}	2023-02-01 16:48:56.538	2023-02-01 16:48:56.549	c8a6a0e66f3e4351875533329692dc42	f
+RUMIPENDY466HITI40_DATA230201164853002	RUMIPENDY466	RUMIPENDY466HITI40	b0507b35095f4ea4b55de368ef71f42a	{"fee": 4200.3, "nama": "Alfo", "harga": 7000.5, "total": 42003, "barang": "Teh Ceri", "cabang": "Tangerang", "jumlah": 6, "totalfee": 12150.8, "totalpenjualan": 121508}	2023-02-01 16:48:56.538	2023-02-01 16:48:56.549	c8a6a0e66f3e4351875533329692dc42	f
+RUMIPENDY466HITI50_DATA2302011554271	RUMIPENDY466	RUMIPENDY466HITI50	7db884cc4c9b4b3ba4005dd5211abe46	{"fee": 9600.6, "nama": "Fadhil", "harga": 8000.5, "total": 96006, "barang": "Caramel", "cabang": "Jakarta", "jumlah": 12, "totalfee": 19251.2, "totalpenjualan": 192512}	2023-02-01 16:29:36.373	2023-02-01 16:29:36.38	2efd98396553402e9c9e041926792c83	f
+RUMIPENDY466HITI50_DATA2302011554272	RUMIPENDY466	RUMIPENDY466HITI50	7db884cc4c9b4b3ba4005dd5211abe46	{"fee": 4750.25, "nama": "Hila", "harga": 9500.5, "total": 47502.5, "barang": "Matcha", "cabang": "Bogor", "jumlah": 5, "totalfee": 19251.2, "totalpenjualan": 192512}	2023-02-01 16:29:36.373	2023-02-01 16:29:36.382	2efd98396553402e9c9e041926792c83	f
+RUMIPENDY466HITI50_DATA2302011554273	RUMIPENDY466	RUMIPENDY466HITI50	7db884cc4c9b4b3ba4005dd5211abe46	{"fee": 4900.35, "nama": "Alfo", "harga": 7000.5, "total": 49003.5, "barang": "Teh", "cabang": "Tangerang", "jumlah": 7, "totalfee": 19251.2, "totalpenjualan": 192512}	2023-02-01 16:29:36.373	2023-02-01 16:29:36.383	2efd98396553402e9c9e041926792c83	f
 \.
 
 
 --
--- TOC entry 3240 (class 2606 OID 29844)
+-- TOC entry 3284 (class 2606 OID 29844)
 -- Name: yformula YFormula_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17136,7 +17427,7 @@ ALTER TABLE ONLY public.yformula
 
 
 --
--- TOC entry 3228 (class 2606 OID 29846)
+-- TOC entry 3272 (class 2606 OID 29846)
 -- Name: Xdata client_data_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17145,7 +17436,7 @@ ALTER TABLE ONLY public."Xdata"
 
 
 --
--- TOC entry 3232 (class 2606 OID 29848)
+-- TOC entry 3276 (class 2606 OID 29848)
 -- Name: data data_pkey1; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17154,7 +17445,16 @@ ALTER TABLE ONLY public.data
 
 
 --
--- TOC entry 3234 (class 2606 OID 29850)
+-- TOC entry 3288 (class 2606 OID 30882)
+-- Name: excel_upload excel_upload_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.excel_upload
+    ADD CONSTRAINT excel_upload_pk PRIMARY KEY (batch_id);
+
+
+--
+-- TOC entry 3278 (class 2606 OID 29850)
 -- Name: formula formula_pkey1; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17163,7 +17463,7 @@ ALTER TABLE ONLY public.formula
 
 
 --
--- TOC entry 3230 (class 2606 OID 29852)
+-- TOC entry 3274 (class 2606 OID 29852)
 -- Name: Xformula theformula_pkey1; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17172,7 +17472,7 @@ ALTER TABLE ONLY public."Xformula"
 
 
 --
--- TOC entry 3236 (class 2606 OID 29854)
+-- TOC entry 3280 (class 2606 OID 29854)
 -- Name: result theresult_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17181,7 +17481,7 @@ ALTER TABLE ONLY public.result
 
 
 --
--- TOC entry 3238 (class 2606 OID 29856)
+-- TOC entry 3282 (class 2606 OID 29856)
 -- Name: ydata ydata_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17190,7 +17490,7 @@ ALTER TABLE ONLY public.ydata
 
 
 --
--- TOC entry 3242 (class 2606 OID 30875)
+-- TOC entry 3286 (class 2606 OID 30875)
 -- Name: ytransaction_v2 ytransaction_v2_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -17198,7 +17498,7 @@ ALTER TABLE ONLY public.ytransaction_v2
     ADD CONSTRAINT ytransaction_v2_pk PRIMARY KEY (client_id, formula_id, data_id);
 
 
--- Completed on 2023-01-26 04:46:09
+-- Completed on 2023-02-08 04:25:23
 
 --
 -- PostgreSQL database dump complete
