@@ -1,4 +1,4 @@
-package APISendData
+package SendData
 
 import (
 	"billing/modules"

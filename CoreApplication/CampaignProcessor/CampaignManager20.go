@@ -64,7 +64,7 @@ func main() {
 	var errRabbit error
 	conn, errRabbit = amqp.Dial("amqp://" + modules.MapConfig["rabbitUser"] + ":" + modules.MapConfig["rabbitPass"] + "@" + modules.MapConfig["rabbitHost"] + ":" + modules.MapConfig["rabbitPort"] + "/" + modules.MapConfig["rabbitVHost"])
 	if errRabbit != nil {
-		modules.DoLog("INFO", "", "MultiRouter", "main",
+		modules.DoLog("INFO", "", "CampaignManager", "main",
 			"Failed to connect to RabbitMQ server. Error", true, errRabbit)
 
 		panic(errRabbit)

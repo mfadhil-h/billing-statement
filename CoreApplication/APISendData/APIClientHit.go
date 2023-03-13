@@ -2,7 +2,7 @@ package main
 
 import (
 	"billing/Config"
-	"billing/CoreApplication/APISendData/APISendData"
+	"billing/CoreApplication/APISendData/SendData"
 	"billing/modules"
 	"bytes"
 	"context"
@@ -206,7 +206,7 @@ func main() {
 
 			// Route the request
 			if incURL == "send" {
-				_, responseHeader, responseContent = APISendData.Process(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				_, responseHeader, responseContent = SendData.Process(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 			}
 
 			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
