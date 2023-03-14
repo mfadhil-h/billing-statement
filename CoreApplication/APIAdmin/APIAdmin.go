@@ -2,6 +2,9 @@ package main
 
 import (
 	"billing/Config"
+	"billing/CoreApplication/APIAdmin/APIGetClient"
+	"billing/CoreApplication/APIAdmin/APIGetData"
+	"billing/CoreApplication/APIAdmin/APIGetFormula"
 	"billing/CoreApplication/APIAdmin/APIRegistrationClient/APINewClient"
 	"billing/CoreApplication/APIAdmin/APIRegistrationGroup/APINewGroup"
 	"billing/CoreApplication/APIAdmin/APIRegistrationUser/APINewUser"
@@ -12,6 +15,9 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,7 +26,8 @@ import (
 	"time"
 )
 
-var db *sql.DB
+var dbPostgres *sql.DB
+var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
@@ -35,7 +42,7 @@ func main() {
 		modules.MapConfig["databaseHost"], modules.MapConfig["databasePort"], modules.MapConfig["databaseUser"],
 		modules.MapConfig["databasePass"], modules.MapConfig["databaseName"])
 
-	db, errDB = sql.Open("postgres", psqlInfo) // db udah di defined diatas, jadi harus pake = bukan :=
+	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
 		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
@@ -43,31 +50,50 @@ func main() {
 		panic(errDB)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	dbPostgres.SetConnMaxLifetime(time.Minute * 10)
+	dbPostgres.SetMaxIdleConns(5)
+	dbPostgres.SetMaxOpenConns(50)
 
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
 			fmt.Println("Failed to close DB Connection.")
 		}
-	}(db)
+	}(dbPostgres)
 
-	errDB = db.Ping()
+	errDB = dbPostgres.Ping()
 	if errDB != nil {
 		panic(errDB)
 	}
 
-	// Initiate Redis
-	rc = modules.InitiateRedisClient()
-	cx = context.Background()
-	errRedis := rc.Ping(cx).Err()
-	if errRedis != nil {
-		panic(errRedis)
-	} else {
-		fmt.Println("Success connected to Redis")
+	/* Setup MongoDB */
+	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if errDB != nil {
+		panic(errDB)
 	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	errDB = client.Connect(ctx)
+	if errDB != nil {
+		panic(errDB)
+	}
+	defer client.Disconnect(ctx)
+	errDB = client.Ping(ctx, readpref.Primary())
+	if errDB != nil {
+		panic(errDB)
+	}
+
+	dbMongo = client.Database("billing_settlement")
+
+	// Initiate Redis
+	//rc = modules.InitiateRedisClient()
+	cx = context.Background()
+	//errRedis := rc.Ping(cx).Err()
+	//if errRedis != nil {
+	//	panic(errRedis)
+	//} else {
+	//	fmt.Println("Success connected to Redis")
+	//}
+	rc = nil
 
 	// APITransaction API
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +135,7 @@ func main() {
 			var incomingHeader = make(map[string]interface{})
 			incomingHeader["Content-Type"] = r.Header.Get("Content-Type")
 
-			//modules.SaveIncomingRequest(db, incTraceCode, strURL, remoteIPAddress, incomingBody)
+			//modules.SaveIncomingRequest(dbPostgres, incTraceCode, strURL, remoteIPAddress, incomingBody)
 
 			mapIncoming := modules.ConvertJSONStringToMap("", incomingBody)
 			incReqType := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
@@ -117,19 +143,35 @@ func main() {
 			// Route the request
 			if incURL == "group" {
 				if strings.ToUpper(incReqType) == "NEW" {
-					_, responseHeader, responseContent = APINewGroup.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APINewGroup.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			} else if incURL == "client" {
 				if strings.ToUpper(incReqType) == "NEW" {
-					_, responseHeader, responseContent = APINewClient.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APINewClient.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_ALL" {
+					_, responseHeader, responseContent = APIGetClient.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
+					_, responseHeader, responseContent = APIGetClient.ProcessGetById(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			} else if incURL == "api" {
 				if strings.ToUpper(incReqType) == "NEW" {
-					_, responseHeader, responseContent = APINewUser.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APINewUser.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
+			} else if incURL == "formula" {
+				if strings.ToUpper(incReqType) == "GET_ALL" {
+					_, responseHeader, responseContent = APIGetFormula.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
+					_, responseHeader, responseContent = APIGetFormula.ProcessGetById(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
+			} else if incURL == "data-formula" {
+				if strings.ToUpper(incReqType) == "GET_ALL" {
+					_, responseHeader, responseContent = APIGetData.ProcessGetAll(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
+					_, responseHeader, responseContent = APIGetData.ProcessGetById(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 
-			//modules.SaveIncomingResponse(db, tracecodeX, responseHeader, responseContent)
+			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
 
 			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
 				"responseHeader: "+fmt.Sprintf("%+v", responseHeader)+", responseContent: "+responseContent,

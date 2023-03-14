@@ -3,8 +3,10 @@ package main
 import (
 	"billing/Config"
 	"billing/CoreApplication/APIClient/APIFormula/APIActivateFormula"
+	"billing/CoreApplication/APIClient/APIFormula/APIGetFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APINewFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APIUpdateFormula"
+	"billing/CoreApplication/APIClient/APIGetData"
 	"billing/modules"
 	"bytes"
 	"context"
@@ -12,6 +14,9 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,7 +25,8 @@ import (
 	"time"
 )
 
-var db *sql.DB
+var dbPostgres *sql.DB
+var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
@@ -35,7 +41,7 @@ func main() {
 		modules.MapConfig["databaseHost"], modules.MapConfig["databasePort"], modules.MapConfig["databaseUser"],
 		modules.MapConfig["databasePass"], modules.MapConfig["databaseName"])
 
-	db, errDB = sql.Open("postgres", psqlInfo) // db udah di defined diatas, jadi harus pake = bukan :=
+	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
 		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
@@ -43,31 +49,49 @@ func main() {
 		panic(errDB)
 	}
 
-	db.SetConnMaxLifetime(time.Minute * 10)
-	db.SetMaxIdleConns(5)
-	db.SetMaxOpenConns(50)
+	dbPostgres.SetConnMaxLifetime(time.Minute * 10)
+	dbPostgres.SetMaxIdleConns(5)
+	dbPostgres.SetMaxOpenConns(50)
 
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
 			fmt.Println("Failed to close DB Connection.")
 		}
-	}(db)
+	}(dbPostgres)
 
-	errDB = db.Ping()
+	errDB = dbPostgres.Ping()
 	if errDB != nil {
 		panic(errDB)
 	}
 
 	// Initiate Redis
-	rc = modules.InitiateRedisClient()
+	rc = nil // modules.InitiateRedisClient()
 	cx = context.Background()
-	errRedis := rc.Ping(cx).Err()
-	if errRedis != nil {
-		panic(errRedis)
-	} else {
-		fmt.Println("Success connected to Redis")
+	//errRedis := rc.Ping(cx).Err()
+	//if errRedis != nil {
+	//	panic(errRedis)
+	//} else {
+	//	fmt.Println("Success connected to Redis")
+	//}
+
+	/* Setup MongoDB */
+	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	if errDB != nil {
+		panic(errDB)
 	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	errDB = client.Connect(ctx)
+	if errDB != nil {
+		panic(errDB)
+	}
+	defer client.Disconnect(ctx)
+	errDB = client.Ping(ctx, readpref.Primary())
+	if errDB != nil {
+		panic(errDB)
+	}
+
+	dbMongo = client.Database("billing_settlement")
 
 	// APITransaction API
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +133,7 @@ func main() {
 			var incomingHeader = make(map[string]interface{})
 			incomingHeader["Content-Type"] = r.Header.Get("Content-Type")
 
-			//modules.SaveIncomingRequest(db, incTraceCode, strURL, remoteIPAddress, incomingBody)
+			//modules.SaveIncomingRequest(dbPostgres, incTraceCode, strURL, remoteIPAddress, incomingBody)
 
 			mapIncoming := modules.ConvertJSONStringToMap("", incomingBody)
 			incReqType := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
@@ -117,15 +141,25 @@ func main() {
 			// Route the request
 			if incURL == "formula" {
 				if strings.ToUpper(incReqType) == "NEW" {
-					_, responseHeader, responseContent = APINewFormula.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APINewFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "UPDATE" {
-					_, responseHeader, responseContent = APIUpdateFormula.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIUpdateFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "ACTIVE" || strings.ToUpper(incReqType) == "DEACTIVE" {
-					_, responseHeader, responseContent = APIActivateFormula.Process(db, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIActivateFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_ALL" {
+					_, responseHeader, responseContent = APIGetFormula.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
+					_, responseHeader, responseContent = APIGetFormula.ProcessGetById(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
+			} else if incURL == "data-formula" {
+				if strings.ToUpper(incReqType) == "GET_ALL" {
+					_, responseHeader, responseContent = APIGetData.ProcessGetAll(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
+					_, responseHeader, responseContent = APIGetData.ProcessGetById(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 
-			//modules.SaveIncomingResponse(db, tracecodeX, responseHeader, responseContent)
+			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
 
 			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
 				"responseHeader: "+fmt.Sprintf("%+v", responseHeader)+", responseContent: "+responseContent,

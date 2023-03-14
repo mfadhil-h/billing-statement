@@ -294,6 +294,7 @@ func main() {
 		panic(errDB)
 	}
 
+	/* Setup MongoDB */
 	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if errDB != nil {
 		panic(errDB)

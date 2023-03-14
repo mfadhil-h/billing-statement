@@ -1,6 +1,6 @@
 package Config
 
-const ConstProduction = false
+const ConstProduction = true
 const ConstRedisKey = "formula_"
 const ConstRedisAPIHitKey = "credAPI_"
 

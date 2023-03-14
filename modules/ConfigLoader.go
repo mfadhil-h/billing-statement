@@ -6,7 +6,7 @@ func LoadConfig() map[string]string {
 	// Local
 	mapConfig["databaseHost"] = "localhost"
 	mapConfig["databasePort"] = "5432"
-	mapConfig["databaseName"] = "billing_fromula"
+	mapConfig["databaseName"] = "billing_formula"
 	//mapConfig["databaseName"] = "pcubilling"
 	mapConfig["databaseUser"] = "postgres"
 	mapConfig["databasePass"] = "postgres"
