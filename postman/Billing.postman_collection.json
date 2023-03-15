@@ -34,7 +34,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get All Client",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/client",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"client"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:41:57 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1443"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"cient_update_datetime\": \"2023-03-15T10:41:57.655824433+07:00\",\n            \"client_address\": \"Jakarta\",\n            \"client_country\": \"ID\",\n            \"client_create_datetime\": \"2023-01-04T19:08:15.88Z\",\n            \"client_currency\": \"IDR\",\n            \"client_email\": \"\",\n            \"client_id\": \"CERUANNDQ446\",\n            \"client_name\": \"CERIA CARI CUAN\",\n            \"client_phone\": \"\",\n            \"client_region\": \"Mampang\",\n            \"client_type\": \"CLIENT\",\n            \"group_id\": \"PINAHANDMZ433\",\n            \"is_active\": true,\n            \"pic_email\": \"alfo.pratomo@gmail.com\",\n            \"pic_name\": \"Alfo\",\n            \"pic_phone\": \"628117336300\"\n        },\n        {\n            \"cient_update_datetime\": \"2023-03-15T10:41:57.655838128+07:00\",\n            \"client_address\": \"Jakarta\",\n            \"client_country\": \"ID\",\n            \"client_create_datetime\": \"2023-01-04T20:52:14.604Z\",\n            \"client_currency\": \"IDR\",\n            \"client_email\": \"\",\n            \"client_id\": \"RUMIPENDY466\",\n            \"client_name\": \"RUMARASA RECIPE\",\n            \"client_phone\": \"\",\n            \"client_region\": \"Mampang\",\n            \"client_type\": \"CLIENT\",\n            \"group_id\": \"PINAHANDMZ433\",\n            \"is_active\": true,\n            \"pic_email\": \"alfo.pratomo@gmail.com\",\n            \"pic_name\": \"Alfo\",\n            \"pic_phone\": \"628117336300\"\n        },\n        {\n            \"cient_update_datetime\": \"2023-03-15T10:41:57.655851808+07:00\",\n            \"client_address\": \"Jakarta\",\n            \"client_country\": \"ID\",\n            \"client_create_datetime\": \"2023-01-04T21:43:03.949Z\",\n            \"client_currency\": \"IDR\",\n            \"client_email\": \"\",\n            \"client_id\": \"RUMNG1NDQ442\",\n            \"client_name\": \"RUMARASA RECIPE CABANG 1\",\n            \"client_phone\": \"\",\n            \"client_region\": \"Mampang\",\n            \"client_type\": \"CLIENT\",\n            \"group_id\": \"MERATINDUW450\",\n            \"is_active\": true,\n            \"pic_email\": \"alfo.pratomo@gmail.com\",\n            \"pic_name\": \"Alfo\",\n            \"pic_phone\": \"628117336300\"\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:41:57\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get One Client By ID",
@@ -61,7 +123,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get One Client By ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/client",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"client"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:42:12 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "515"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"cient_update_datetime\": \"2023-03-15T10:42:12.595842713+07:00\",\n        \"client_address\": \"Jakarta\",\n        \"client_country\": \"ID\",\n        \"client_create_datetime\": \"2023-01-04T20:52:14.604Z\",\n        \"client_currency\": \"IDR\",\n        \"client_email\": \"\",\n        \"client_id\": \"RUMIPENDY466\",\n        \"client_name\": \"RUMARASA RECIPE\",\n        \"client_phone\": \"\",\n        \"client_region\": \"Mampang\",\n        \"client_type\": \"CLIENT\",\n        \"group_id\": \"PINAHANDMZ433\",\n        \"is_active\": true,\n        \"pic_email\": \"alfo.pratomo@gmail.com\",\n        \"pic_name\": \"Alfo\",\n        \"pic_phone\": \"628117336300\"\n    },\n    \"datetime\": \"2023-03-15 10:42:12\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get All Formula",
@@ -88,7 +212,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get All Formula",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:50:26 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-01-24T14:53:44.662Z\",\n            \"formula_id\": \"RUMIPENDY466HITI40\",\n            \"formula_name\": \"hitungpajakversi40\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104660453+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-01-24T18:10:25.767Z\",\n            \"formula_id\": \"RUMIPENDY466HITI20\",\n            \"formula_name\": \"hitungpajakversi20\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104678124+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-02-01T15:45:28.527Z\",\n            \"formula_id\": \"RUMIPENDY466HITI50\",\n            \"formula_name\": \"hitungpajakversi50\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104690014+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-02-01T18:05:55.942Z\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"formula_name\": \"hitungpajakversi80\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104701355+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-13T20:49:20.909Z\",\n            \"formula_id\": \"RUMIPENDY466HITROD\",\n            \"formula_name\": \"hitungpajakversi80prod\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104712386+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-14T22:53:37.482Z\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"formula_name\": \"hitungpajakversi80\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104720685+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-15T10:39:21Z\",\n            \"formula_id\": \"RUMIPENDY466HITROD\",\n            \"formula_name\": \"hitungpajakversi80prod\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:50:26.104727249+07:00\",\n            \"is_active\": true\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:50:26\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get One Formula By ID",
@@ -97,7 +283,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -115,7 +301,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get One Formula By ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:50:37 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "826"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"client_id\": \"RUMIPENDY466\",\n        \"fields\": [\n            \"nama\",\n            \"cabang\",\n            \"barang\",\n            \"jumlah\",\n            \"harga\",\n            \"total\",\n            \"fee\",\n            \"totalpenjualan\",\n            \"totalfee\"\n        ],\n        \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n        \"formula_create_datetime\": \"2023-02-01T18:05:55.942Z\",\n        \"formula_id\": \"RUMIPENDY466HITI80\",\n        \"formula_name\": \"hitungpajakversi80\",\n        \"formula_time\": \"00:00:00\",\n        \"formula_type\": \"REALTIME\",\n        \"formula_update_datetime\": \"2023-03-15T10:50:37.304110085+07:00\",\n        \"is_active\": true\n    },\n    \"datetime\": \"2023-03-15 10:50:37\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get All Formula Data",
@@ -124,7 +372,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -142,7 +390,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get All Formula Data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/data-formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"data-formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:48:52 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388150\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.877Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Latte\",\n                \"cabang\": \"Jakarta\",\n                \"harga\": \"7500.5\",\n                \"jumlah\": \"7\",\n                \"nama\": \"Hila\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388161\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.879Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 5250.35, \\\"nama\\\": \\\"Hila\\\", \\\"harga\\\": 7500.5, \\\"total\\\": 52503.5, \\\"barang\\\": \\\"Latte\\\", \\\"cabang\\\": \\\"Jakarta\\\", \\\"jumlah\\\": 7, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Teh Ceri\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"7000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Alfo\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388162\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.88Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 4200.3, \\\"nama\\\": \\\"Alfo\\\", \\\"harga\\\": 7000.5, \\\"total\\\": 42003, \\\"barang\\\": \\\"Teh Ceri\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Vivo\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"12000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Chandra\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388173\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.882Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 7200.3, \\\"nama\\\": \\\"Chandra\\\", \\\"harga\\\": 12000.5, \\\"total\\\": 72003, \\\"barang\\\": \\\"Vivo\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823000\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.864Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Latte\",\n                \"cabang\": \"Jakarta\",\n                \"harga\": \"7500.5\",\n                \"jumlah\": \"7\",\n                \"nama\": \"Hila\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823001\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.865Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 5250.35, \\\"nama\\\": \\\"Hila\\\", \\\"harga\\\": 7500.5, \\\"total\\\": 52503.5, \\\"barang\\\": \\\"Latte\\\", \\\"cabang\\\": \\\"Jakarta\\\", \\\"jumlah\\\": 7, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Teh Ceri\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"7000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Alfo\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823002\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.867Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 4200.3, \\\"nama\\\": \\\"Alfo\\\", \\\"harga\\\": 7000.5, \\\"total\\\": 42003, \\\"barang\\\": \\\"Teh Ceri\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Vivo\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"12000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Chandra\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823003\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.872Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 7200.3, \\\"nama\\\": \\\"Chandra\\\", \\\"harga\\\": 12000.5, \\\"total\\\": 72003, \\\"barang\\\": \\\"Vivo\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:48:52\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get One Formula Data By ID",
@@ -151,7 +461,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\",\r\n    \"dataid\": \"RUMIPENDY466HITI20_DATA2302011622541\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -169,7 +479,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get One Formula Data By ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31110/data-formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31110",
+									"path": [
+										"data-formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:51:04 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "732"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388150\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.877Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"fields\": {\n                \"_id\": \"64109adaa5a0a0d47843b930\",\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:51:04\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				}
 			]
 		},
@@ -201,7 +573,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get All Formula",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:51:14 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-01-24T14:53:44.662Z\",\n            \"formula_id\": \"RUMIPENDY466HITI40\",\n            \"formula_name\": \"hitungpajakversi40\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469339625+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-01-24T18:10:25.767Z\",\n            \"formula_id\": \"RUMIPENDY466HITI20\",\n            \"formula_name\": \"hitungpajakversi20\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469357918+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-02-01T15:45:28.527Z\",\n            \"formula_id\": \"RUMIPENDY466HITI50\",\n            \"formula_name\": \"hitungpajakversi50\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469367412+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-02-01T18:05:55.942Z\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"formula_name\": \"hitungpajakversi80\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469375276+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-13T20:49:20.909Z\",\n            \"formula_id\": \"RUMIPENDY466HITROD\",\n            \"formula_name\": \"hitungpajakversi80prod\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469382512+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-14T22:53:37.482Z\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"formula_name\": \"hitungpajakversi80\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.46938962+07:00\",\n            \"is_active\": true\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"fields\": [\n                \"nama\",\n                \"cabang\",\n                \"barang\",\n                \"jumlah\",\n                \"harga\",\n                \"total\",\n                \"fee\",\n                \"totalpenjualan\",\n                \"totalfee\"\n            ],\n            \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n            \"formula_create_datetime\": \"2023-03-15T10:39:21Z\",\n            \"formula_id\": \"RUMIPENDY466HITROD\",\n            \"formula_name\": \"hitungpajakversi80prod\",\n            \"formula_time\": \"00:00:00\",\n            \"formula_type\": \"REALTIME\",\n            \"formula_update_datetime\": \"2023-03-15T10:51:14.469396018+07:00\",\n            \"is_active\": true\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:51:14\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get One Formula By ID",
@@ -210,7 +644,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -228,7 +662,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get One Formula By ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:51:55 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "826"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"client_id\": \"RUMIPENDY466\",\n        \"fields\": [\n            \"nama\",\n            \"cabang\",\n            \"barang\",\n            \"jumlah\",\n            \"harga\",\n            \"total\",\n            \"fee\",\n            \"totalpenjualan\",\n            \"totalfee\"\n        ],\n        \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\n        \"formula_create_datetime\": \"2023-02-01T18:05:55.942Z\",\n        \"formula_id\": \"RUMIPENDY466HITI80\",\n        \"formula_name\": \"hitungpajakversi80\",\n        \"formula_time\": \"00:00:00\",\n        \"formula_type\": \"REALTIME\",\n        \"formula_update_datetime\": \"2023-03-15T10:51:55.666920982+07:00\",\n        \"is_active\": true\n    },\n    \"datetime\": \"2023-03-15 10:51:55\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get All Formula Data",
@@ -237,7 +733,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -255,7 +751,69 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get All Formula Data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/data-formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"data-formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:52:20 GMT"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388150\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.877Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Latte\",\n                \"cabang\": \"Jakarta\",\n                \"harga\": \"7500.5\",\n                \"jumlah\": \"7\",\n                \"nama\": \"Hila\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388161\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.879Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 5250.35, \\\"nama\\\": \\\"Hila\\\", \\\"harga\\\": 7500.5, \\\"total\\\": 52503.5, \\\"barang\\\": \\\"Latte\\\", \\\"cabang\\\": \\\"Jakarta\\\", \\\"jumlah\\\": 7, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Teh Ceri\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"7000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Alfo\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388162\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.88Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 4200.3, \\\"nama\\\": \\\"Alfo\\\", \\\"harga\\\": 7000.5, \\\"total\\\": 42003, \\\"barang\\\": \\\"Teh Ceri\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Vivo\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"12000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Chandra\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388173\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.882Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 7200.3, \\\"nama\\\": \\\"Chandra\\\", \\\"harga\\\": 12000.5, \\\"total\\\": 72003, \\\"barang\\\": \\\"Vivo\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823000\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.864Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Latte\",\n                \"cabang\": \"Jakarta\",\n                \"harga\": \"7500.5\",\n                \"jumlah\": \"7\",\n                \"nama\": \"Hila\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823001\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.865Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 5250.35, \\\"nama\\\": \\\"Hila\\\", \\\"harga\\\": 7500.5, \\\"total\\\": 52503.5, \\\"barang\\\": \\\"Latte\\\", \\\"cabang\\\": \\\"Jakarta\\\", \\\"jumlah\\\": 7, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Teh Ceri\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"7000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Alfo\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823002\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.867Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 4200.3, \\\"nama\\\": \\\"Alfo\\\", \\\"harga\\\": 7000.5, \\\"total\\\": 42003, \\\"barang\\\": \\\"Teh Ceri\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        },\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_details\": {\n                \"barang\": \"Vivo\",\n                \"cabang\": \"Tangerang\",\n                \"harga\": \"12000.5\",\n                \"jumlah\": \"6\",\n                \"nama\": \"Chandra\"\n            },\n            \"data_id\": \"RUMIPENDY466HITI80_DATA230315104823003\",\n            \"data_process_datetime\": \"2023-03-15T10:48:23.872Z\",\n            \"data_receive_code\": \"69c74674779d41598b447e3f7965e41f\",\n            \"data_receive_datetime\": \"2023-03-15 10:48:23.00\",\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"1ce35b4934cc48f0bf9bd9242fd69ccd\",\n            \"results\": \"{\\\"fee\\\": 7200.3, \\\"nama\\\": \\\"Chandra\\\", \\\"harga\\\": 12000.5, \\\"total\\\": 72003, \\\"barang\\\": \\\"Vivo\\\", \\\"cabang\\\": \\\"Tangerang\\\", \\\"jumlah\\\": 6, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:52:20\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Get One Formula Data By ID",
@@ -264,7 +822,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI20\",\r\n    \"dataid\": \"RUMIPENDY466HITI20_DATA2302011622541\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -282,7 +840,158 @@
 							]
 						}
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Get One Formula Data By ID",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/data-formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"data-formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:52:40 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "732"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"client_id\": \"RUMIPENDY466\",\n            \"data_id\": \"RUMIPENDY466HITI80_DATA2303142303388150\",\n            \"data_process_datetime\": \"2023-03-14T23:03:38.877Z\",\n            \"data_receive_code\": \"9b807ee37b9b4f5ca84d1dbed986d2ac\",\n            \"data_receive_datetime\": \"2023-03-14 23:03:38.797\",\n            \"fields\": {\n                \"_id\": \"64109adaa5a0a0d47843b930\",\n                \"barang\": \"Caramel\",\n                \"cabang\": \"Bandung\",\n                \"harga\": \"9000.5\",\n                \"jumlah\": \"3\",\n                \"nama\": \"Fadhil\"\n            },\n            \"formula_id\": \"RUMIPENDY466HITI80\",\n            \"is_process\": false,\n            \"process_id\": \"cdc003b88faf44a6988d7f7c1c717958\",\n            \"results\": \"{\\\"fee\\\": 2700.15, \\\"nama\\\": \\\"Fadhil\\\", \\\"harga\\\": 9000.5, \\\"total\\\": 27001.5, \\\"barang\\\": \\\"Caramel\\\", \\\"cabang\\\": \\\"Bandung\\\", \\\"jumlah\\\": 3, \\\"totalfee\\\": 19351.1, \\\"totalpenjualan\\\": 193511}\"\n        }\n    ],\n    \"datetime\": \"2023-03-15 10:52:40\",\n    \"status\": \"000\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Insert Formula V3",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ip-server}}:31122/formula",
+							"host": [
+								"{{ip-server}}"
+							],
+							"port": "31122",
+							"path": [
+								"formula"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Insert Formula V3",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:55:21 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"datetime\": \"2023-03-15 10:55:21\",\n    \"formulaid\": \"RUMIPENDY466HITAGI\",\n    \"status\": \"000\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Insert Data V2",
@@ -291,7 +1000,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"datas\": [\r\n        {\r\n            \"nama\": \"Fadhil\",\r\n            \"cabang\": \"Bandung\",\r\n            \"barang\": \"Caramel\",\r\n            \"jumlah\": \"3\",\r\n            \"harga\": \"9000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Hila\",\r\n            \"cabang\": \"Jakarta\",\r\n            \"barang\": \"Latte\",\r\n            \"jumlah\": \"7\",\r\n            \"harga\": \"7500.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Alfo\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Teh Ceri\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"7000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Chandra\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Vivo\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"12000.5\"\r\n        }\r\n    ]\r\n}",
+							"raw": "{\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"datas\": [\r\n        {\r\n            \"nama\": \"Fadhil\",\r\n            \"cabang\": \"Bandung\",\r\n            \"barang\": \"Caramel\",\r\n            \"jumlah\": \"3\",\r\n            \"harga\": \"9000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Hila\",\r\n            \"cabang\": \"Jakarta\",\r\n            \"barang\": \"Latte\",\r\n            \"jumlah\": \"7\",\r\n            \"harga\": \"7500.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Alfo\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Teh Ceri\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"7000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Chandra\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Vivo\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"12000.5\"\r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -309,34 +1018,69 @@
 							]
 						}
 					},
-					"response": []
-				},
-				{
-					"name": "Insert Formula V3",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi80prod\",\r\n    \"formula\": \"@string: nama@\\n@string: cabang@\\n@string: barang@\\n@formula: total = jumlah * harga@\\n@formula: fee  = total * 10 / 100@\\n@formula: totalpenjualan = SUM(total)@\\n@formula: totalfee = SUM(fee)@\\n@outputheader: nama, cabang, barang, jumlah, harga, total, fee@\\n@outputdatagroup: nama asc, cabang asc, barang asc@\\n@outputrecapgroup: totalpenjualan@\\n@outputrecapgroup: totalfee@\",\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+					"response": [
+						{
+							"name": "Insert Data V2",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"datas\": [\r\n        {\r\n            \"nama\": \"Fadhil\",\r\n            \"cabang\": \"Bandung\",\r\n            \"barang\": \"Caramel\",\r\n            \"jumlah\": \"3\",\r\n            \"harga\": \"9000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Hila\",\r\n            \"cabang\": \"Jakarta\",\r\n            \"barang\": \"Latte\",\r\n            \"jumlah\": \"7\",\r\n            \"harga\": \"7500.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Alfo\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Teh Ceri\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"7000.5\"\r\n        },\r\n        {\r\n            \"nama\": \"Chandra\",\r\n            \"cabang\": \"Tangerang\",\r\n            \"barang\": \"Vivo\",\r\n            \"jumlah\": \"6\",\r\n            \"harga\": \"12000.5\"\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31234/send",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31234",
+									"path": [
+										"send"
+									]
 								}
-							}
-						},
-						"url": {
-							"raw": "{{ip-server}}:31122/formula",
-							"host": [
-								"{{ip-server}}"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 03:48:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "98"
+								}
 							],
-							"port": "31122",
-							"path": [
-								"formula"
-							]
+							"cookie": [],
+							"body": "{\n    \"datetime\": \"2023-03-15 10:48:23\",\n    \"receivecode\": \"1bb1e0f5793c47b79a56eb9fc64826d3\",\n    \"status\": \"000\"\n}"
 						}
-					},
-					"response": []
+					]
 				},
 				{
 					"name": "(Not Used) Insert Data V1",
