@@ -32,8 +32,8 @@ func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		/* TEMP REMOVE AUTH FOR TEST */
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
-		//incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		//incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
+		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
 		//incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
@@ -41,7 +41,7 @@ func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 		isValid := modules.DoCheckFormulaID(rc, cx, incFormulaID)
 
 		//if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid && isCredentialValid {
-		if len(incClientID) > 0 && len(incFormulaID) > 0 && isValid {
+		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid {
 
 			isSuccess := modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, incTraceCode, mapIncoming)
 

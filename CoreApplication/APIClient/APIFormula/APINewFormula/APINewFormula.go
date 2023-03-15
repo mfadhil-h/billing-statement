@@ -48,7 +48,8 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid {
 
 			//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
-			isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
+			//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
+			isSuccess, strFormulaID := modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
 
 			if isSuccess {
 				modules.ReloadFormulaToRedis(db, rc, cx, strFormulaID)
