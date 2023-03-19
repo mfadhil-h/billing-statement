@@ -34,14 +34,14 @@ func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
-		//incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
+		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 		isValid := modules.DoCheckFormulaID(rc, cx, incFormulaID)
 
-		//if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid && isCredentialValid {
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid {
+		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid && isCredentialValid {
+			//if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid {
 
 			isSuccess := modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, incTraceCode, mapIncoming)
 

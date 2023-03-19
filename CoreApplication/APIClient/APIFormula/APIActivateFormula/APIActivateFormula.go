@@ -78,10 +78,13 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
+		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 		incStatus := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 {
+		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+
+		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 && isCredentialValid {
 
 			isSuccess := saveToDatabase(db, rc, cx, incTraceCode, mapIncoming)
 

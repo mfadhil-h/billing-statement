@@ -555,7 +555,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"RUMIPEZSoupsRrLeWU\",\r\n    \"password\": \"HljS4E7Bsu1HUxlTVA1xAQc4T\",\r\n    \"key\": \"6e8c816f-aa87-4ebe-8c58-87c59a3b6bb6\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -822,7 +822,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"GET_BY_ID\",\r\n    \"username\": \"RUMIPEZSoupsRrLeWU\",\r\n    \"password\": \"HljS4E7Bsu1HUxlTVA1xAQc4T\",\r\n    \"key\": \"6e8c816f-aa87-4ebe-8c58-87c59a3b6bb6\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\",\r\n    \"dataid\": \"RUMIPENDY466HITI80_DATA2303142303388150\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1000,7 +1000,96 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": {\r\n        \"string\": [\r\n            \"nama\",\r\n            \"cabang\",\r\n            \"barang\"\r\n        ],\r\n        \"formula\": [\r\n            \"total = jumlah * harga\",\r\n            \"fee = total * 10 / 100\",\r\n            \"totalpenjualan = SUM(total)\",\r\n            \"totalfee = SUM(fee)\"\r\n        ],\r\n        \"outputheader\": [\r\n            \"nama, cabang, barang, jumlah, harga, total, fee\"\r\n        ],\r\n        \"outputdatagroup\": [\r\n            \"nama asc, cabang asc, barang asc\",\r\n            \"totalpenjualan\",\r\n            \"totalfee\"\r\n        ]\r\n    },\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"username\": \"RUMIPEZSoupsRrLeWU\",\r\n    \"password\": \"HljS4E7Bsu1HUxlTVA1xAQc4T\",\r\n    \"key\": \"6e8c816f-aa87-4ebe-8c58-87c59a3b6bb6\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"type\": \"REALTIME\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": {\r\n        \"string\": [\r\n            \"nama\",\r\n            \"cabang\",\r\n            \"barang\"\r\n        ],\r\n        \"formula\": [\r\n            \"total = jumlah * harga\",\r\n            \"fee = total * 10 / 100\",\r\n            \"totalpenjualan = SUM(total)\",\r\n            \"totalfee = SUM(fee)\"\r\n        ],\r\n        \"outputheader\": [\r\n            \"nama, cabang, barang, jumlah, harga, total, fee\"\r\n        ],\r\n        \"outputdatagroup\": [\r\n            \"nama asc, cabang asc, barang asc\",\r\n            \"totalpenjualan\",\r\n            \"totalfee\"\r\n        ]\r\n    },\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ip-server}}:31122/formula",
+							"host": [
+								"{{ip-server}}"
+							],
+							"port": "31122",
+							"path": [
+								"formula"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Insert Formula V4 (On Plan)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"NEW\",\r\n    \"type\": \"REALTIME\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": {\r\n        \"string\": [\r\n            \"nama\",\r\n            \"cabang\",\r\n            \"barang\"\r\n        ],\r\n        \"formula\": [\r\n            \"total = jumlah * harga\",\r\n            \"fee = total * 10 / 100\",\r\n            \"totalpenjualan = SUM(total)\",\r\n            \"totalfee = SUM(fee)\"\r\n        ],\r\n        \"outputheader\": [\r\n            \"nama, cabang, barang, jumlah, harga, total, fee\"\r\n        ],\r\n        \"outputdatagroup\": [\r\n            \"nama asc, cabang asc, barang asc\",\r\n            \"totalpenjualan\",\r\n            \"totalfee\"\r\n        ]\r\n    },\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/formula",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"formula"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 15 Mar 2023 09:08:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "82"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"datetime\": \"2023-03-15 16:08:48\",\n    \"formulaid\": \"RUMIPENDY466HITAGI\",\n    \"status\": \"000\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Formula",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reqtype\": \"UPDATE\",\r\n    \"type\": \"REALTIME\",\r\n    \"username\": \"test\",\r\n    \"password\": \"test\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"time\": \"\",\r\n    \"name\": \"hitungpajakversi90lagi\",\r\n    \"formula\": {\r\n        \"string\": [\r\n            \"nama\",\r\n            \"cabang\",\r\n            \"barang\"\r\n        ],\r\n        \"formula\": [\r\n            \"total = jumlah * harga\",\r\n            \"fee = total * 10 / 100\",\r\n            \"totalpenjualan = SUM(total)\",\r\n            \"totalfee = SUM(fee)\"\r\n        ],\r\n        \"outputheader\": [\r\n            \"nama, cabang, barang, jumlah, harga, total, fee\"\r\n        ],\r\n        \"outputdatagroup\": [\r\n            \"nama asc, cabang asc, barang asc\",\r\n            \"totalpenjualan\",\r\n            \"totalfee\"\r\n        ]\r\n    },\r\n    \"fields\": [\r\n        \"nama\",\r\n        \"cabang\",\r\n        \"barang\",\r\n        \"jumlah\",\r\n        \"harga\",\r\n        \"total\",\r\n        \"fee\",\r\n        \"totalpenjualan\",\r\n        \"totalfee\"\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

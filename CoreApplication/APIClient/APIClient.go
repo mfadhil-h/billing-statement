@@ -66,14 +66,14 @@ func main() {
 	}
 
 	// Initiate Redis
-	rc = nil // modules.InitiateRedisClient()
+	rc = modules.InitiateRedisClient()
 	cx = context.Background()
-	//errRedis := rc.Ping(cx).Err()
-	//if errRedis != nil {
-	//	panic(errRedis)
-	//} else {
-	//	fmt.Println("Success connected to Redis")
-	//}
+	errRedis := rc.Ping(cx).Err()
+	if errRedis != nil {
+		panic(errRedis)
+	} else {
+		fmt.Println("Success connected to Redis")
+	}
 
 	/* Setup MongoDB */
 	client, errDB := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))

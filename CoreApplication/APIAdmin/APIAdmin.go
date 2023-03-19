@@ -85,15 +85,15 @@ func main() {
 	dbMongo = client.Database("billing_settlement")
 
 	// Initiate Redis
-	//rc = modules.InitiateRedisClient()
+	rc = modules.InitiateRedisClient()
 	cx = context.Background()
-	//errRedis := rc.Ping(cx).Err()
-	//if errRedis != nil {
-	//	panic(errRedis)
-	//} else {
-	//	fmt.Println("Success connected to Redis")
-	//}
-	rc = nil
+	errRedis := rc.Ping(cx).Err()
+	if errRedis != nil {
+		panic(errRedis)
+	} else {
+		fmt.Println("Success connected to Redis")
+	}
+	//rc = nil
 
 	// APITransaction API
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

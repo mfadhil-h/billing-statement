@@ -33,11 +33,14 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		/* TEMP REMOVE AUTH FOR TEST */
 
+		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
+		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incType := modules.GetStringFromMapInterface(mapIncoming, "type")
 		incTime := modules.GetStringFromMapInterface(mapIncoming, "time")
+
+		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 
 		if strings.ToUpper(incType) != "REALTIME" && len(incTime) == 0 {
 			isTypeValid = false
@@ -45,7 +48,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			isTypeValid = true
 		}
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid {
+		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid && isCredentialValid {
 
 			//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
 			//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
