@@ -108,12 +108,13 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)
+			respDescription = "Invalid Request - no body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
-
+		respDescription = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 

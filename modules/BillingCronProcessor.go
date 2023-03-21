@@ -67,6 +67,8 @@ func checkFunction(incFormula string) (bool, interface{}) {
 }
 
 func processForNonString(incFormula string, mapData map[string]interface{}) (bool, bool, string) {
+	println("processForNonString: " + fmt.Sprintf("mapData: %+v", mapData))
+	println("processForNonString: " + fmt.Sprintf("incFormula: %+v", incFormula))
 
 	strResult := ""
 	isSuccess := false
@@ -74,6 +76,7 @@ func processForNonString(incFormula string, mapData map[string]interface{}) (boo
 	//incProcessID := GetStringFromMapInterface(mapData, "processid")
 
 	isFunction, _ := checkFunction(incFormula)
+	println("processForNonString: " + fmt.Sprintf("isFunction: %+v", isFunction))
 	if !isFunction {
 		expression, _ := govaluate.NewEvaluableExpression(incFormula)
 		println(fmt.Sprintf("expression: %+v", expression))
@@ -119,8 +122,14 @@ func getData(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 	redisVal, _ := RedisGet(rc, cx, redisKey)
 	mapRedis := ConvertJSONStringToMap("", redisVal)
 
-	arrFormula := mapRedis["formula"].([]interface{})
-	arrResult := mapRedis["result"].([]interface{})
+	var arrFormula []interface{}
+	var arrResult []interface{}
+	if mapRedis["formula"] != nil {
+		arrFormula = mapRedis["formula"].([]interface{})
+	}
+	if mapRedis["result"] != nil {
+		arrResult = mapRedis["result"].([]interface{})
+	}
 	collectionName := incClientID + "_" + incFormulaID
 
 	incProcessID := GenerateUUID()

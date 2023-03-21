@@ -717,8 +717,24 @@ func SaveDataBillingIntoMongo(db *mongo.Database, rc *redis.Client, cx context.C
 
 	//incDatas := mapIncoming["datas"].([]map[string]interface{})
 	rawDatas := mapIncoming["datas"].([]interface{})
+
 	for _, data := range rawDatas {
 		mapData := data.(map[string]interface{})
+		var listDelKey []string
+		//cleanMapData := make(map[string]interface{})
+		for key, obj := range mapData {
+			cleanKey := strings.ReplaceAll(key, " ", "")
+			if cleanKey != key {
+				listDelKey = append(listDelKey, key)
+				mapData[cleanKey] = obj
+			}
+		}
+		if len(listDelKey) > 0 {
+			for _, key := range listDelKey {
+				delete(mapData, key)
+			}
+		}
+
 		incDatas = append(incDatas, mapData)
 	}
 	names, err := db.ListCollectionNames(cx, bson.M{})
@@ -816,22 +832,56 @@ func SaveFormulaBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[s
 	return isSuccess, incFormulaID
 }
 
-func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string) {
+func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string, string) {
 
 	isSuccess := false
 	strFormula := ""
 
 	incClientID := GetStringFromMapInterface(mapIncoming, "clientid")
 
-	incFields := mapIncoming["fields"].(interface{})
+	incFields := mapIncoming["fields"].([]interface{})
+	var arrFields []string
 
+	for _, incField := range incFields {
+		arrFields = append(arrFields, strings.ReplaceAll(incField.(string), " ", ""))
+	}
+
+	//interfaceFields := incFields.(interface{})
+
+	isFormulaValid := true
 	incFormulaMap := mapIncoming["formula"].(map[string]interface{})
 	for key, incItem := range incFormulaMap {
 		arrItem := incItem.([]interface{})
 		for _, item := range arrItem {
-			strFormula += "@" + key + ": " + item.(string) + "@\n"
+			strItem := item.(string)
+			splitStrItem := strings.Split(strItem, "=")
+			if len(splitStrItem) > 1 {
+				DoLog("INFO", incTraceCode, "API", "Formula",
+					fmt.Sprintf("splitStrItem: %+v.", splitStrItem), false, nil)
+				DoLog("INFO", incTraceCode, "API", "Formula",
+					fmt.Sprintf("splitStrItem[1]: %+v, splitStrItem[0]: %+v.", splitStrItem[1], splitStrItem[0]), false, nil)
+				if strings.Contains(strings.ReplaceAll(splitStrItem[1], " ", ""), strings.ReplaceAll(splitStrItem[0], " ", "")) {
+					DoLog("INFO", incTraceCode, "API", "Formula",
+						fmt.Sprintf("TRUE: plitStrItem[1]: %+v, splitStrItem[0]: %+v.", strings.ReplaceAll(splitStrItem[1], " ", ""),
+							strings.ReplaceAll(splitStrItem[0], " ", "")), false, nil)
+					isFormulaValid = false
+					break
+				}
+			}
+			strFormula += "@" + strings.ReplaceAll(key, " ", "") + ": " + strings.ReplaceAll(strItem, " ", "") + "@\n"
+			strFormula = strings.ReplaceAll(strFormula, "%", "/100")
+		}
+		if !isFormulaValid {
+			break
 		}
 	}
+
+	if !isFormulaValid {
+		DoLog("ERROR", incTraceCode, "API", "Formula",
+			"Formula Format is Invalid.", true, nil)
+		return false, "", "Formula format is invalid"
+	}
+
 	if strings.HasSuffix(strFormula, "\n") {
 		strings.TrimSuffix(strFormula, "\n")
 	}
@@ -848,9 +898,10 @@ func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming 
 	query := `INSERT INTO yformula_v3 (formula_id, client_id, formula_name,	fields, formula, formula_type, formula_time,
         formula_create_datetime, is_active) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 
-	result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName, pq.Array(incFields),
+	result, err := db.Exec(query, incFormulaID, incClientID, incFormulaName, pq.Array(arrFields),
 		strFormula, incType, incTime, incTimeNow, true)
 
+	statusDesc := "Failed to insert tables"
 	if err != nil {
 		DoLog("ERROR", incTraceCode, "API", "Formula",
 			"Failed to insert tables. Error occur.", true, err)
@@ -859,15 +910,15 @@ func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming 
 		rowAffected, _ := result.RowsAffected()
 		if rowAffected >= 0 {
 			isSuccess = true
+			statusDesc = "Success to insert"
 			DoLog("INFO", incTraceCode, "API", "Formula",
 				"Success to insert tables.", true, nil)
 		} else {
-			isSuccess = false
 			DoLog("ERROR", incTraceCode, "API", "Formula",
 				"Failed to insert tables. Error occur.", true, err)
 		}
 	}
-	return isSuccess, incFormulaID
+	return isSuccess, incFormulaID, statusDesc
 }
 
 func GetSUM(incFormula string, mapDatas []map[string]interface{}) float64 {

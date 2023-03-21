@@ -245,6 +245,7 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 	results := make(map[string]interface{})
 
 	respStatus := "900"
+	statusDesc := ""
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
@@ -266,17 +267,20 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
 	responseHeader["Content-Type"] = "application/json"
 
 	mapResponse["data"] = results
+	mapResponse["description"] = statusDesc
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
 

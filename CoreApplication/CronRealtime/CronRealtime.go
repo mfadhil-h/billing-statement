@@ -87,7 +87,9 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 
 						} else if strings.ToUpper(incID) == "FORMULA" {
 							fmt.Println(incParameter)
+							println("loadToRedis: " + fmt.Sprintf("incParameter: %+v", incParameter))
 							rawParameter := strings.Split(incParameter, "=")
+							println("loadToRedis: " + fmt.Sprintf("rawParameter: %+v", rawParameter))
 
 							for y := 0; y < len(rawParameter); y++ {
 
@@ -100,6 +102,8 @@ func loadToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 									strInsertAsFormula = append(strInsertAsFormula, rawFormulas)
 								}
 							}
+							println("loadToRedis: " + fmt.Sprintf("strInsertAsResult: %+v", strInsertAsResult))
+							println("loadToRedis: " + fmt.Sprintf("strInsertAsFormula: %+v", strInsertAsFormula))
 
 						} else if strings.ToUpper(incID) == "OUTPUTHEADER" {
 							fmt.Println(incParameter)

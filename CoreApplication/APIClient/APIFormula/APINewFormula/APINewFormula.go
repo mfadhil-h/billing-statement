@@ -20,6 +20,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 	isTypeValid := false
 	respStatus := "900"
+	statusDesc := ""
 	respFormulaID := ""
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
@@ -52,7 +53,9 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 			//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
 			//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
-			isSuccess, strFormulaID := modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
+			isSuccess := false
+			strFormulaID := ""
+			isSuccess, strFormulaID, statusDesc = modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
 
 			if isSuccess {
 				modules.ReloadFormulaToRedis(db, rc, cx, strFormulaID)
@@ -65,11 +68,13 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
@@ -77,6 +82,7 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 	mapResponse["formulaid"] = respFormulaID
 	mapResponse["status"] = respStatus
+	mapResponse["description"] = statusDesc
 	mapResponse["datetime"] = respDatetime
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
