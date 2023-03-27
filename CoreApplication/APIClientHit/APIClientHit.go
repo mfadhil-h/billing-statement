@@ -2,7 +2,7 @@ package main
 
 import (
 	"billing/Config"
-	"billing/CoreApplication/APISendData/SendData"
+	"billing/CoreApplication/APIClientHit/SendData"
 	"billing/modules"
 	"bytes"
 	"context"

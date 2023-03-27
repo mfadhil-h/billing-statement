@@ -87,13 +87,13 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 
 				if len(postgresResults) > 0 {
 					finalResult["process_id"] = postgresResults["process_id"]
-					finalResult["results"] = postgresResults["results"]
+					finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
 					finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
 					finalResult["data_receive_code"] = postgresResults["data_receive_code"]
 					finalResult["is_process"] = postgresResults["is_process"]
 				} else {
 					finalResult["process_id"] = ""
-					finalResult["results"] = ""
+					finalResult["results"] = make(map[string]interface{})
 					finalResult["data_process_datetime"] = ""
 					finalResult["data_receive_code"] = ""
 					finalResult["is_process"] = false

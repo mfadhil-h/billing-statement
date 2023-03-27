@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	guuid "github.com/google/uuid"
 	"strings"
+	"time"
 )
 
 const redisToken = "authtoken_"
@@ -71,7 +72,8 @@ func GenerateFormulaID(incClientID string, incName string) string {
 	incName = strings.Replace(incName, " ", "", -1)
 	strPrefix := incName[:3]
 	strSuffix := incName[len(incName)-3:]
-	strName := strings.ToUpper(strPrefix + strSuffix)
+	secondMilli := DoFormatDateTime("ssS", time.Now())
+	strName := strings.ToUpper(strPrefix + strSuffix + secondMilli)
 
 	theID := incClientID + strName
 

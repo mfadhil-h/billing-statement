@@ -4,6 +4,7 @@ import (
 	"billing/modules"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/go-redis/redis/v8"
@@ -31,8 +32,8 @@ var incomingPrefetchCount = 1
 
 var incomingQueueName = "EXCEL_INCOMING_DATA"
 
-// var fileDirectory = "/mnt/hgfs/SyncedProjects/BlastMeWeb30_client/BlastMeWeb30_client/public/upload_smspersonalized/"
-var fileDirectory = "/app/web_wadyn_client/public/storage/app/public/autogenbnumber/"
+// var fileDirectory = "/app/web_wadyn_client/public/storage/app/public/autogenbnumber/"
+var fileDirectory = "/3c/app/SETTLEMENT/upload_excel/"
 
 func doProcessTheBatch(queueMessage string) {
 	// Convert queueMessage to JSON MAP
@@ -119,9 +120,15 @@ func doProcessTheBatch(queueMessage string) {
 						mapFormulaAtt["formula"] = formulas
 						mapFormulaAtt["type"] = scheduleType
 						mapFormulaAtt["time"] = schedule
-
-						/* SAVE FORMULA ONLY RETURN WITH FORMULA ID THEN MERGE WITH DATA VALUES */
-						isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt)
+						isSuccess := false
+						strFormulaID := ""
+						if json.Valid([]byte(formulas)) {
+							/* SAVE FORMULA ONLY RETURN WITH FORMULA ID THEN MERGE WITH DATA VALUES */
+							isSuccess, strFormulaID, _ = modules.SaveFormulaArrayBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt)
+						} else {
+							/* SAVE FORMULA ONLY RETURN WITH FORMULA ID THEN MERGE WITH DATA VALUES */
+							isSuccess, strFormulaID = modules.SaveFormulaBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt)
+						}
 
 						if isSuccess {
 							modules.ReloadFormulaToRedis(dbPostgres, rc, cx, strFormulaID)
