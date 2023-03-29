@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/lib/pq"
+	"strings"
 	"time"
 )
 
@@ -64,25 +65,69 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 				timeFormulaUpdateDatetime := modules.ConvertSQLNullTimeToTime(formulaUpdateDatetime)
 				boolIsActive := modules.ConvertSQLNullBoolToBool(isActive)
 
-				//splitFormula := strings.Split(strFormula, "\n")
-				//for _, item := range splitFormula {
-				//	if strings.HasSuffix(item, "@") {
-				//		strings.TrimSuffix(item, "@")
-				//	}
-				//	if strings.HasPrefix(item, "@") {
-				//		strings.TrimPrefix(item, "@")
-				//	}
-				//	splitMap := strings.Split(item, ":")
-				//	for i, s := range splitMap {
-				//
-				//	}
-				//}
+				var strInsertAsFormula []string
+
+				var strInsertAsResultString []string
+
+				var strOutputHeader []string
+
+				var strOutputDataGroup []string
+				var strOutputRecapGroup []string
+
+				strFormula = strings.ReplaceAll(strFormula, "@", "")
+				arrFormulas := strings.Split(strFormula, "\n")
+				for x := 0; x < len(arrFormulas); x++ {
+					arrContent := strings.Split(arrFormulas[x], ":")
+
+					if len(arrFormulas[x]) > 1 && len(arrContent) > 1 {
+						incID := arrContent[0]
+						incParameter := strings.TrimLeft(strings.TrimRight(arrContent[1], " "), " ")
+						modules.DoLog("INFO", "", "LandingGRPC", "Package",
+							"getOneFormula: "+fmt.Sprintf("incID: %+v", incID)+fmt.Sprintf(", incParameter: %+v", incParameter), false, nil)
+
+						if strings.ToUpper(incID) == "STRING" {
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawResults := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strInsertAsResultString = append(strInsertAsResultString, rawResults)
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "FORMULA" {
+							strInsertAsFormula = append(strInsertAsFormula, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTHEADER" {
+							strOutputHeader = append(strOutputHeader, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTDATAGROUP" {
+							strOutputDataGroup = append(strOutputDataGroup, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTRECAPGROUP" {
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawFormulas := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strOutputRecapGroup = append(strOutputRecapGroup, rawFormulas)
+								}
+							}
+						}
+					}
+				}
+
+				var mapFormula = make(map[string]interface{})
+				mapFormula["formula"] = strInsertAsFormula
+				mapFormula["string"] = strInsertAsResultString
+				mapFormula["outputheader"] = strOutputHeader
+				mapFormula["outputdatagroup"] = strOutputDataGroup
+				mapFormula["outputrecapgroup"] = strOutputRecapGroup
 
 				mapReturn["client_id"] = strClientId
 				mapReturn["formula_id"] = strFormulaId
 				mapReturn["formula_name"] = strFormulaName
 				mapReturn["fields"] = fields
-				mapReturn["formula"] = strFormula
+				mapReturn["formula"] = mapFormula
 				mapReturn["formula_type"] = strFormulaType
 				mapReturn["formula_time"] = strFormulaTime
 				mapReturn["formula_create_datetime"] = timeFormulaCreateDatetime
@@ -201,11 +246,69 @@ func getOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 				timeFormulaUpdateDatetime := modules.ConvertSQLNullTimeToTime(formulaUpdateDatetime)
 				boolIsActive := modules.ConvertSQLNullBoolToBool(isActive)
 
+				var strInsertAsFormula []string
+
+				var strInsertAsResultString []string
+
+				var strOutputHeader []string
+
+				var strOutputDataGroup []string
+				var strOutputRecapGroup []string
+
+				strFormula = strings.ReplaceAll(strFormula, "@", "")
+				arrFormulas := strings.Split(strFormula, "\n")
+				for x := 0; x < len(arrFormulas); x++ {
+					arrContent := strings.Split(arrFormulas[x], ":")
+
+					if len(arrFormulas[x]) > 1 && len(arrContent) > 1 {
+						incID := arrContent[0]
+						incParameter := strings.TrimLeft(strings.TrimRight(arrContent[1], " "), " ")
+						modules.DoLog("INFO", "", "LandingGRPC", "Package",
+							"getOneFormula: "+fmt.Sprintf("incID: %+v", incID)+fmt.Sprintf(", incParameter: %+v", incParameter), false, nil)
+
+						if strings.ToUpper(incID) == "STRING" {
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawResults := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strInsertAsResultString = append(strInsertAsResultString, rawResults)
+								}
+							}
+
+						} else if strings.ToUpper(incID) == "FORMULA" {
+							strInsertAsFormula = append(strInsertAsFormula, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTHEADER" {
+							strOutputHeader = append(strOutputHeader, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTDATAGROUP" {
+							strOutputDataGroup = append(strOutputDataGroup, incParameter)
+						} else if strings.ToUpper(incID) == "OUTPUTRECAPGROUP" {
+							rawParameter := strings.Split(incParameter, "=")
+
+							for y := 0; y < len(rawParameter); y++ {
+
+								if y == 0 {
+									rawFormulas := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
+									strOutputRecapGroup = append(strOutputRecapGroup, rawFormulas)
+								}
+							}
+						}
+					}
+				}
+
+				var mapFormula = make(map[string]interface{})
+				mapFormula["formula"] = strInsertAsFormula
+				mapFormula["string"] = strInsertAsResultString
+				mapFormula["outputheader"] = strOutputHeader
+				mapFormula["outputdatagroup"] = strOutputDataGroup
+				mapFormula["outputrecapgroup"] = strOutputRecapGroup
+
 				mapReturn["client_id"] = strClientId
 				mapReturn["formula_id"] = strFormulaId
 				mapReturn["formula_name"] = strFormulaName
 				mapReturn["fields"] = fields
-				mapReturn["formula"] = strFormula
+				mapReturn["formula"] = mapFormula
 				mapReturn["formula_type"] = strFormulaType
 				mapReturn["formula_time"] = strFormulaTime
 				mapReturn["formula_create_datetime"] = timeFormulaCreateDatetime

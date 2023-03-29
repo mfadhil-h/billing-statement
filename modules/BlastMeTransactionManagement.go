@@ -866,9 +866,39 @@ func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming 
 							strings.ReplaceAll(splitStrItem[0], " ", "")), false, nil)
 					isFormulaValid = false
 					break
+				} else {
+					strItem = strings.ReplaceAll(splitStrItem[0], " ", "") + " = " + strings.ReplaceAll(splitStrItem[1], " ", "")
 				}
 			}
-			strFormula += "@" + strings.ReplaceAll(key, " ", "") + ": " + strings.ReplaceAll(strItem, " ", "") + "@\n"
+			if strings.ToUpper(key) == "OUTPUTHEADER" || strings.ToUpper(key) == "OUTPUTRECAPGROUP" || strings.ToUpper(key) == "OUTPUTDATAGROUP" {
+				arrStrItem := strings.Split(strItem, ",")
+				newStrItem := ""
+
+				for z := 0; z < len(arrStrItem); z++ {
+					rawStrItem := ""
+					if strings.Contains(arrStrItem[z], "asc") || strings.Contains(arrStrItem[z], "desc") {
+						if strings.Contains(arrStrItem[z], "ASC") {
+							tempStrItem := strings.TrimRight(arrStrItem[z], "asc")
+							rawStrItem = strings.ReplaceAll(tempStrItem, " ", "") + " asc"
+						} else if strings.Contains(arrStrItem[z], "desc") {
+							tempStrItem := strings.TrimRight(arrStrItem[z], "desc")
+							rawStrItem = strings.ReplaceAll(tempStrItem, " ", "") + " desc"
+						}
+					} else {
+						rawStrItem = strings.ReplaceAll(arrStrItem[z], " ", "")
+					}
+					newStrItem += rawStrItem + ", "
+					if z == len(arrStrItem)-1 {
+						newStrItem = strings.TrimRight(newStrItem, ", ")
+					}
+				}
+				if len(newStrItem) > 0 {
+					strItem = newStrItem
+				}
+				strFormula += "@" + strings.ReplaceAll(key, " ", "") + ": " + strItem + "@\n"
+			} else {
+				strFormula += "@" + strings.ReplaceAll(key, " ", "") + ": " + strings.ReplaceAll(strItem, " ", "") + "@\n"
+			}
 			strFormula = strings.ReplaceAll(strFormula, "%", "/100")
 		}
 		if !isFormulaValid {

@@ -86,12 +86,14 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 				respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
 
 				if len(postgresResults) > 0 {
+					finalResult["formula_name"] = postgresResults["formula_name"]
 					finalResult["process_id"] = postgresResults["process_id"]
 					finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
 					finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
 					finalResult["data_receive_code"] = postgresResults["data_receive_code"]
 					finalResult["is_process"] = postgresResults["is_process"]
 				} else {
+					finalResult["formula_name"] = ""
 					finalResult["process_id"] = ""
 					finalResult["results"] = make(map[string]interface{})
 					finalResult["data_process_datetime"] = ""
@@ -131,8 +133,8 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	incDataID := modules.GetStringFromMapInterface(mapIncoming, "dataid")
 
-	query := `SELECT data_id, client_id, formula_id, process_id, results, data_receive_datetime, data_process_datetime, 
-        data_receive_code, is_process FROM ytransaction_v2 WHERE formula_id = $1 AND data_id = $2 LIMIT 1`
+	query := `SELECT data_id, yt2.client_id, yt2.formula_id, f.formula_name, process_id, results, data_receive_datetime, data_process_datetime, 
+        data_receive_code, is_process FROM ytransaction_v2 yt2 LEFT JOIN yformula_v3 f on yt2.formula_id = f.formula_id WHERE yt2.formula_id = $1 AND data_id = $2 LIMIT 1`
 
 	rows, err := dbPostgres.Query(query, incFormulaID, incDataID)
 
@@ -146,6 +148,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 		for rows.Next() {
 
 			var formulaId sql.NullString
+			var formulaName sql.NullString
 			var clientId sql.NullString
 			var dataId sql.NullString
 			var processId sql.NullString
@@ -155,7 +158,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 			var dataReceiveCode sql.NullString
 			var isProcess sql.NullBool
 
-			errS := rows.Scan(&dataId, &clientId, &formulaId, &processId, &results,
+			errS := rows.Scan(&dataId, &clientId, &formulaId, &formulaName, &processId, &results,
 				&dataReceiveDatetime, &dataProcessDatetime, &dataReceiveCode, &isProcess)
 
 			if errS != nil {
@@ -167,6 +170,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 				strDataId := modules.ConvertSQLNullStringToString(dataId)
 				strClientId := modules.ConvertSQLNullStringToString(clientId)
 				strFormulaId := modules.ConvertSQLNullStringToString(formulaId)
+				strFormulaName := modules.ConvertSQLNullStringToString(formulaName)
 				strProcessId := modules.ConvertSQLNullStringToString(processId)
 				strResults := modules.ConvertSQLNullStringToString(results)
 				timeFormulaCreateDatetime := modules.ConvertSQLNullTimeToTime(dataReceiveDatetime)
@@ -177,6 +181,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 				mapReturn["data_id"] = strDataId
 				mapReturn["client_id"] = strClientId
 				mapReturn["formula_id"] = strFormulaId
+				mapReturn["formula_name"] = strFormulaName
 				mapReturn["process_id"] = strProcessId
 				mapReturn["results"] = strResults
 				mapReturn["data_receive_datetime"] = timeFormulaCreateDatetime
@@ -271,12 +276,14 @@ func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 				respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
 
 				if len(postgresResults) > 0 {
+					finalResult["formula_name"] = postgresResults["formula_name"]
 					finalResult["process_id"] = postgresResults["process_id"]
-					finalResult["results"] = postgresResults["results"]
+					finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
 					finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
 					finalResult["data_receive_code"] = postgresResults["data_receive_code"]
 					finalResult["is_process"] = postgresResults["is_process"]
 				} else {
+					finalResult["formula_name"] = ""
 					finalResult["process_id"] = ""
 					finalResult["results"] = ""
 					finalResult["data_process_datetime"] = ""
