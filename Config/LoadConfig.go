@@ -3,6 +3,8 @@ package Config
 const ConstProduction = true
 const ConstRedisKey = "formula_"
 const ConstRedisAPIHitKey = "credAPI_"
+const ConstRedisAPIAccessToken = "accessTokenAPI_"
+const ConstRedisAPIRefreshToken = "refreshTokenAPI_"
 
 const ConstAPIReceiverPort = "31234"
 const ConstAPIClientPort = "31122"
