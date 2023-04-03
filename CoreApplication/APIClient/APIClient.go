@@ -2,6 +2,7 @@ package main
 
 import (
 	"billing/Config"
+	"billing/CoreApplication/APIClient/APICredential"
 	"billing/CoreApplication/APIClient/APIFormula/APIActivateFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APIGetFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APINewFormula"
@@ -156,6 +157,14 @@ func main() {
 					_, responseHeader, responseContent = APIGetData.ProcessGetAll(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
 					_, responseHeader, responseContent = APIGetData.ProcessGetById(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
+			} else if incURL == "token" {
+				if strings.ToUpper(incReqType) == "GET_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessGetNewToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "REFRESH_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessRefreshToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 

@@ -344,13 +344,25 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 {
+		//isCredentialValid := modules.DoCheckRedisCredential(redisClient, contextX, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-			respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
+		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
+
+			isCredentialValid := modules.DoCheckRedisCredential(redisClient, contextX, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+
+			if isCredentialValid {
+
+				respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
+			} else {
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
+			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)

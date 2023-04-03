@@ -1,7 +1,7 @@
 package APIGetData
 
 import (
-	"billing/CoreApplication/APIAdmin/APIGetFormula"
+	"billing/CoreApplication/APIClient/APIFormula/APIGetFormula"
 	"billing/modules"
 	"context"
 	"database/sql"
@@ -137,70 +137,80 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 {
-			mapDataResults["client_id"] = incClientID
-			mapDataResults["formula_id"] = incFormulaID
-			respStatus, statusDesc, mongoResults = getAllFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
-			_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
-			if len(mapFormula) > 0 {
-				mapDataResults["fields"] = mapFormula["fields"]
-				mapDataResults["formula_name"] = mapFormula["formula_name"]
-			} else {
-				mapDataResults["fields"] = make([]map[string]interface{}, 0, 0)
-				mapDataResults["formula_name"] = ""
-			}
-			if len(mongoResults) > 0 {
-				for _, mongoResult := range mongoResults {
-					delete(mongoResult, "_id") // Remove unused data json
-					finalResult := make(map[string]interface{})
+		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
 
-					mapIncoming["dataid"] = mongoResult["data_id"]
-					//finalResult["data_id"] = mongoResult["data_id"]
-					//finalResult["client_id"] = mongoResult["client_id"]
-					//finalResult["formula_id"] = mongoResult["formula_id"]
-					//finalResult["data_receive_datetime"] = mongoResult["data_receive_datetime"]
-					//finalResult["data_details"] = mongoResult
-					for key, value := range mongoResult {
-						finalResult[key] = value
-					}
+			isCredentialValid := modules.DoCheckRedisCredential(redisClient, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-					respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+			if isCredentialValid {
+				mapDataResults["client_id"] = incClientID
+				mapDataResults["formula_id"] = incFormulaID
+				respStatus, statusDesc, mongoResults = getAllFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
+				_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+				if len(mapFormula) > 0 {
+					mapDataResults["fields"] = mapFormula["fields"]
+					mapDataResults["formula_name"] = mapFormula["formula_name"]
+				} else {
+					mapDataResults["fields"] = make([]map[string]interface{}, 0, 0)
+					mapDataResults["formula_name"] = ""
+				}
+				if len(mongoResults) > 0 {
+					for _, mongoResult := range mongoResults {
+						delete(mongoResult, "_id") // Remove unused data json
+						finalResult := make(map[string]interface{})
 
-					if len(postgresResults) > 0 {
-						finalResult["formula_name"] = postgresResults["formula_name"]
-						finalResult["process_id"] = postgresResults["process_id"]
-						//finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
-						mapResultPostgres := modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
-						for key, value := range mapResultPostgres {
+						mapIncoming["dataid"] = mongoResult["data_id"]
+						//finalResult["data_id"] = mongoResult["data_id"]
+						//finalResult["client_id"] = mongoResult["client_id"]
+						//finalResult["formula_id"] = mongoResult["formula_id"]
+						//finalResult["data_receive_datetime"] = mongoResult["data_receive_datetime"]
+						//finalResult["data_details"] = mongoResult
+						for key, value := range mongoResult {
 							finalResult[key] = value
 						}
-						finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
-						finalResult["data_receive_code"] = postgresResults["data_receive_code"]
-						finalResult["is_process"] = postgresResults["is_process"]
-					} else {
-						finalResult["formula_name"] = ""
-						finalResult["process_id"] = ""
-						//finalResult["results"] = make(map[string]interface{})
-						finalResult["data_process_datetime"] = ""
-						finalResult["data_receive_code"] = ""
-						finalResult["is_process"] = false
+
+						respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+
+						if len(postgresResults) > 0 {
+							finalResult["formula_name"] = postgresResults["formula_name"]
+							finalResult["process_id"] = postgresResults["process_id"]
+							//finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
+							mapResultPostgres := modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
+							for key, value := range mapResultPostgres {
+								finalResult[key] = value
+							}
+							finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
+							finalResult["data_receive_code"] = postgresResults["data_receive_code"]
+							finalResult["is_process"] = postgresResults["is_process"]
+						} else {
+							finalResult["formula_name"] = ""
+							finalResult["process_id"] = ""
+							//finalResult["results"] = make(map[string]interface{})
+							finalResult["data_process_datetime"] = ""
+							finalResult["data_receive_code"] = ""
+							finalResult["is_process"] = false
+						}
+						delete(mongoResult, "_id")                   // Remove unused data json
+						delete(mongoResult, "client_id")             // Remove unused data json
+						delete(mongoResult, "formula_id")            // Remove unused data json
+						delete(mongoResult, "process_id")            // Remove unused data json
+						delete(mongoResult, "data_receive_datetime") // Remove unused data json
+						delete(mongoResult, "data_receive_code")     // Remove unused data json
+						delete(mongoResult, "is_process")            // Remove unused data json
+						finalResults = append(finalResults, finalResult)
 					}
-					delete(mongoResult, "_id")                   // Remove unused data json
-					delete(mongoResult, "client_id")             // Remove unused data json
-					delete(mongoResult, "formula_id")            // Remove unused data json
-					delete(mongoResult, "process_id")            // Remove unused data json
-					delete(mongoResult, "data_receive_datetime") // Remove unused data json
-					delete(mongoResult, "data_receive_code")     // Remove unused data json
-					delete(mongoResult, "is_process")            // Remove unused data json
-					finalResults = append(finalResults, finalResult)
+					mapDataResults["results"] = finalResults
+				} else {
+					statusDesc = "Data empty"
 				}
-				mapDataResults["results"] = finalResults
 			} else {
-				statusDesc = "Data empty"
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
@@ -287,72 +297,82 @@ func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 		modules.DoLog("INFO", incTraceCode, "API", "Auth",
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 		incDataID := modules.GetStringFromMapInterface(mapIncoming, "dataid")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incFormulaID) > 0 && len(incDataID) > 0 && len(incClientID) > 0 {
-			mapDataResults["client_id"] = incClientID
-			mapDataResults["formula_id"] = incFormulaID
-			respStatus, statusDesc, mongoResults = getOneFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
-			_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
-			if len(mapFormula) > 0 {
-				mapDataResults["fields"] = mapFormula["fields"]
-				mapDataResults["formula_name"] = mapFormula["formula_name"]
-			} else {
-				mapDataResults["fields"] = make([]map[string]interface{}, 0, 0)
-				mapDataResults["formula_name"] = ""
-			}
-			modules.DoLog("INFO", incTraceCode, "APIGetData", "ProcessGetById",
-				fmt.Sprintf("mongoResults: %+v", mongoResults), false, nil)
-			if len(mongoResults) > 0 {
-				for _, mongoResult := range mongoResults {
-					finalResult := make(map[string]interface{})
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incDataID) > 0 && len(incClientID) > 0 && len(incAccessToken) > 0 {
 
-					mapIncoming["dataid"] = mongoResult["data_id"]
-					//finalResult["data_id"] = mongoResult["data_id"]
-					//finalResult["client_id"] = mongoResult["client_id"]
-					//finalResult["formula_id"] = mongoResult["formula_id"]
-					//finalResult["data_receive_datetime"] = mongoResult["data_receive_datetime"]
-					//finalResult["fields"] = mongoResult
-					for key, value := range mongoResult {
-						finalResult[key] = value
-					}
+			isCredentialValid := modules.DoCheckRedisCredential(redisClient, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-					respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+			if isCredentialValid {
+				mapDataResults["client_id"] = incClientID
+				mapDataResults["formula_id"] = incFormulaID
+				respStatus, statusDesc, mongoResults = getOneFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
+				_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+				if len(mapFormula) > 0 {
+					mapDataResults["fields"] = mapFormula["fields"]
+					mapDataResults["formula_name"] = mapFormula["formula_name"]
+				} else {
+					mapDataResults["fields"] = make([]map[string]interface{}, 0, 0)
+					mapDataResults["formula_name"] = ""
+				}
+				modules.DoLog("INFO", incTraceCode, "APIGetData", "ProcessGetById",
+					fmt.Sprintf("mongoResults: %+v", mongoResults), false, nil)
+				if len(mongoResults) > 0 {
+					for _, mongoResult := range mongoResults {
+						finalResult := make(map[string]interface{})
 
-					if len(postgresResults) > 0 {
-						finalResult["formula_name"] = postgresResults["formula_name"]
-						finalResult["process_id"] = postgresResults["process_id"]
-						//finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
-						mapResultPostgres := modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
-						for key, value := range mapResultPostgres {
+						mapIncoming["dataid"] = mongoResult["data_id"]
+						//finalResult["data_id"] = mongoResult["data_id"]
+						//finalResult["client_id"] = mongoResult["client_id"]
+						//finalResult["formula_id"] = mongoResult["formula_id"]
+						//finalResult["data_receive_datetime"] = mongoResult["data_receive_datetime"]
+						//finalResult["fields"] = mongoResult
+						for key, value := range mongoResult {
 							finalResult[key] = value
 						}
-						finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
-						finalResult["data_receive_code"] = postgresResults["data_receive_code"]
-						finalResult["is_process"] = postgresResults["is_process"]
-					} else {
-						finalResult["formula_name"] = ""
-						finalResult["process_id"] = ""
-						//finalResult["results"] = make(map[string]interface{})
-						finalResult["data_process_datetime"] = ""
-						finalResult["data_receive_code"] = ""
-						finalResult["is_process"] = false
+
+						respStatus, postgresResults = getOneFormulaDataFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+
+						if len(postgresResults) > 0 {
+							finalResult["formula_name"] = postgresResults["formula_name"]
+							finalResult["process_id"] = postgresResults["process_id"]
+							//finalResult["results"] = modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
+							mapResultPostgres := modules.ConvertJSONStringToMap(finalResult["data_id"].(string), postgresResults["results"].(string))
+							for key, value := range mapResultPostgres {
+								finalResult[key] = value
+							}
+							finalResult["data_process_datetime"] = postgresResults["data_process_datetime"]
+							finalResult["data_receive_code"] = postgresResults["data_receive_code"]
+							finalResult["is_process"] = postgresResults["is_process"]
+						} else {
+							finalResult["formula_name"] = ""
+							finalResult["process_id"] = ""
+							//finalResult["results"] = make(map[string]interface{})
+							finalResult["data_process_datetime"] = ""
+							finalResult["data_receive_code"] = ""
+							finalResult["is_process"] = false
+						}
+						delete(mongoResult, "_id")                   // Remove unused data json
+						delete(mongoResult, "client_id")             // Remove unused data json
+						delete(mongoResult, "formula_id")            // Remove unused data json
+						delete(mongoResult, "process_id")            // Remove unused data json
+						delete(mongoResult, "data_receive_datetime") // Remove unused data json
+						delete(mongoResult, "data_receive_code")     // Remove unused data json
+						delete(mongoResult, "is_process")            // Remove unused data json
+						finalResults = append(finalResults, finalResult)
 					}
-					delete(mongoResult, "_id")                   // Remove unused data json
-					delete(mongoResult, "client_id")             // Remove unused data json
-					delete(mongoResult, "formula_id")            // Remove unused data json
-					delete(mongoResult, "process_id")            // Remove unused data json
-					delete(mongoResult, "data_receive_datetime") // Remove unused data json
-					delete(mongoResult, "data_receive_code")     // Remove unused data json
-					delete(mongoResult, "is_process")            // Remove unused data json
-					finalResults = append(finalResults, finalResult)
+					mapDataResults["results"] = finalResults
+				} else {
+					statusDesc = "Data empty"
 				}
-				mapDataResults["results"] = finalResults
 			} else {
-				statusDesc = "Data empty"
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",

@@ -2,6 +2,7 @@ package main
 
 import (
 	"billing/Config"
+	"billing/CoreApplication/APIClientHit/APICredential"
 	"billing/CoreApplication/APIClientHit/SendData"
 	"billing/modules"
 	"bytes"
@@ -130,17 +131,6 @@ func main() {
 	}
 
 	dbMongo = client.Database("billing_settlement")
-	//databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	//if err != nil {
-	//	panic(errDB)
-	//}
-	//fmt.Println(databases)
-	//command := bson.D{{"create", "newCollection01"}}
-	//var result bson.M
-	//if errDB = db.RunCommand(context.TODO(), command).Decode(&result); err != nil {
-	//	panic(errDB)
-	//}
-	//fmt.Println(fmt.Sprintf("success: %+v", result))
 
 	// Initiate Redis
 	rc = modules.InitiateRedisClient()
@@ -202,11 +192,19 @@ func main() {
 			//modules.SaveIncomingRequest(dbPostgres, incTraceCode, strURL, remoteIPAddress, incomingBody)
 
 			mapIncoming := modules.ConvertJSONStringToMap("", incomingBody)
-			//incReqType := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
+			incReqType := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
 			// Route the request
 			if incURL == "send" {
 				_, responseHeader, responseContent = SendData.Process(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+			} else if incURL == "token" {
+				if strings.ToUpper(incReqType) == "GET_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessGetNewToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "REFRESH_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessRefreshToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
+					_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
 			}
 
 			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)

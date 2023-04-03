@@ -87,28 +87,36 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
-		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isCredentialValid {
+		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
 
-			isSuccess := saveToDatabase(db, incTraceCode, mapIncoming)
+			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				respDescription = "Formula successfully updated and will be running in the next 1 hour"
-				respStatus = "000"
+			if isCredentialValid {
+				isSuccess := saveToDatabase(db, incTraceCode, mapIncoming)
+
+				if isSuccess {
+					respDescription = "Formula successfully updated and will be running in the next 1 hour"
+					respStatus = "000"
+				} else {
+					respDescription = "Formula failed to update"
+					respStatus = "900"
+				}
 			} else {
-				respDescription = "Formula failed to update"
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				respDescription = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)
-			respDescription = "Invalid Request - no body request"
+			respDescription = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {

@@ -76,27 +76,35 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
-		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 		incStatus := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
-		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+		//isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 && isCredentialValid {
+		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 && len(incAccessToken) > 0 {
 
-			isSuccess := saveToDatabase(db, rc, cx, incTraceCode, mapIncoming)
+			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				respStatus = "000"
-				if strings.ToUpper(incStatus) == "ACTIVE" {
-					respDescription = "Formula successfully activated"
-				} else if strings.ToUpper(incStatus) == "DEACTIVE" {
-					respDescription = "Formula successfully deactivated"
+			if isCredentialValid {
+				isSuccess := saveToDatabase(db, rc, cx, incTraceCode, mapIncoming)
+
+				if isSuccess {
+					respStatus = "000"
+					if strings.ToUpper(incStatus) == "ACTIVE" {
+						respDescription = "Formula successfully activated"
+					} else if strings.ToUpper(incStatus) == "DEACTIVE" {
+						respDescription = "Formula successfully deactivated"
+					}
+				} else {
+					respStatus = "900"
 				}
 			} else {
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				respDescription = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",

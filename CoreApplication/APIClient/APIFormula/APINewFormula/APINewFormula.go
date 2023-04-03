@@ -36,12 +36,11 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
-		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incType := modules.GetStringFromMapInterface(mapIncoming, "type")
 		incTime := modules.GetStringFromMapInterface(mapIncoming, "time")
 
-		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 
 		if strings.ToUpper(incType) != "REALTIME" && len(incTime) == 0 {
 			isTypeValid = false
@@ -49,21 +48,30 @@ func Process(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode stri
 			isTypeValid = true
 		}
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid && isCredentialValid {
+		if len(incUsername) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid && len(incAccessToken) > 0 {
 
-			//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
-			//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
-			isSuccess := false
-			strFormulaID := ""
-			isSuccess, strFormulaID, statusDesc = modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
+			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				modules.ReloadFormulaToRedis(db, rc, cx, strFormulaID)
+			if isCredentialValid {
+				//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
+				//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
+				isSuccess := false
+				strFormulaID := ""
+				isSuccess, strFormulaID, statusDesc = modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
 
-				respStatus = "000"
-				respFormulaID = strFormulaID
+				if isSuccess {
+					modules.ReloadFormulaToRedis(db, rc, cx, strFormulaID)
+
+					respStatus = "000"
+					respFormulaID = strFormulaID
+				} else {
+					respStatus = "900"
+				}
 			} else {
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",

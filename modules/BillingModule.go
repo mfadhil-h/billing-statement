@@ -202,6 +202,81 @@ func DoCheckRedisClientHit(rc *redis.Client, cx context.Context, incClient strin
 	return isValid
 }
 
+func DoCheckRedisCredential(rc *redis.Client, cx context.Context, incClientID string,
+	incUsername string, incAccessToken string, incRemoteIP string) bool {
+	isValid := false
+
+	redisKey := Config.ConstRedisAPIAccessToken + incClientID + incUsername
+	redisVal, errG := RedisGet(rc, cx, redisKey)
+	if errG == nil {
+		//isRemoteIPValid := false
+		mapRedisVal := ConvertJSONStringToMap("", redisVal)
+		//strUsername := GetStringFromMapInterface(mapRedisVal, "username")
+		//strClientID := GetStringFromMapInterface(mapRedisVal, "clientid")
+		strAccessToken := GetStringFromMapInterface(mapRedisVal, "accesstoken")
+		strRemoteIP := GetStringFromMapInterface(mapRedisVal, "remoteip")
+		if strings.Contains(strRemoteIP, incRemoteIP) || strings.Contains(strRemoteIP, "ALL") {
+			if strAccessToken == incAccessToken {
+				isValid = true
+				DoLog("INFO", "", "APICredential", "createNewToken",
+					"Success User's access is matched. ", false, nil)
+			} else {
+				DoLog("INFO", "", "APICredential", "createNewToken",
+					"Failed User's access is unmatched.", false, nil)
+				//return status and desc is failed password
+				//status = "400"
+				//statusDesc = "Failed - User's access is unmatched or not found"
+				isValid = false
+			}
+		} else {
+			DoLog("INFO", "", "APICredential", "createNewToken",
+				"Failed User's IP not whitelisted. Error occur.", false, nil)
+			//return status and desc is failed password
+			//status = "400"
+			//statusDesc = "Failed - User's IP not whitelisted"
+			isValid = false
+		}
+	} else {
+		DoLog("ERROR", "", "APICredential", "createNewToken",
+			fmt.Sprintln("Failed get redis: ", incClientID+incUsername)+". Error occur.", true, errG)
+		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
+		//isStatus = false
+		//status = "400"
+		//statusDesc = "Failed - Create refresh token"
+		isValid = false
+	}
+	return isValid
+
+	//isValid := false
+	//isIPALLValid := false
+	//isIPAddressValid := false
+	//
+	//redisKey := Config.ConstRedisAPIHitKey + incClient
+	//redisVal, errR := RedisGet(rc, cx, redisKey)
+	//if errR == nil {
+	//	//isRemoteIPValid := false
+	//	mapRedisVal := ConvertJSONStringToMap("", redisVal)
+	//	strUsername := GetStringFromMapInterface(mapRedisVal, "username")
+	//	strPassword := GetStringFromMapInterface(mapRedisVal, "password")
+	//	strKey := GetStringFromMapInterface(mapRedisVal, "key")
+	//	strRemoteIP := GetStringFromMapInterface(mapRedisVal, "remoteip")
+	//
+	//	isIPALLValid = strings.Contains(strRemoteIP, "ALL")
+	//	isIPAddressValid = strings.Contains(strRemoteIP, incRemoteIP)
+	//
+	//	if incUsername == strUsername && incPassword == strPassword && incKey == strKey {
+	//		if isIPAddressValid {
+	//			isValid = true
+	//		} else if isIPALLValid {
+	//			isValid = true
+	//		} else {
+	//			isValid = false
+	//		}
+	//	}
+	//}
+	//return isValid
+}
+
 //func ReloadFormulaToRedis(db *sql.DB, rc *redis.Client, cx context.Context, incFormulaID string) {
 //
 //	var arrF [50]string
