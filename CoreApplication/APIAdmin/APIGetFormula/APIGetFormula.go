@@ -166,6 +166,7 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incKey := modules.GetStringFromMapInterface(mapIncoming, "key")
 
+		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 		isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 
 		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && isCredentialValid {
@@ -192,7 +193,7 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	return incTraceCode, responseHeader, responseContent
 }
 
-func getOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
+func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
 	mapReturn := make(map[string]interface{})
 	responseStatus := "400"
 
@@ -349,7 +350,7 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 
 		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 {
 
-			respStatus, results = getOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
+			respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
 		} else {
 			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
 				"Request not valid", false, nil)
