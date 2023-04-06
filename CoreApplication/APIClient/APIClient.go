@@ -3,6 +3,7 @@ package main
 import (
 	"billing/Config"
 	"billing/CoreApplication/APIClient/APICredential"
+	"billing/CoreApplication/APIClient/APIEnum"
 	"billing/CoreApplication/APIClient/APIFormula/APIActivateFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APIGetFormula"
 	"billing/CoreApplication/APIClient/APIFormula/APINewFormula"
@@ -163,8 +164,12 @@ func main() {
 					_, responseHeader, responseContent = APICredential.ProcessGetNewToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "REFRESH_TOKEN" {
 					_, responseHeader, responseContent = APICredential.ProcessRefreshToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
-				} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					//} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
+					//	_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				}
+			} else if incURL == "enum" {
+				if strings.ToUpper(incReqType) == "SCHEDULE" {
+					_, responseHeader, responseContent = APIEnum.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 

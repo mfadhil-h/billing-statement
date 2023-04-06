@@ -245,43 +245,43 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incCli
 	return mapResponse, status, statusDesc
 }
 
-func deleteToken(redisClient *redis.Client, goContext context.Context, incClientID string,
-	incUsername string) (map[string]interface{}, string, string) {
-
-	mapResponse := make(map[string]interface{})
-	//boolIsActive := false
-
-	//isStatus := false
-	status := "400"
-	statusDesc := "Failed"
-
-	redisKeyRefresh := Config.ConstRedisAPIRefreshToken + incClientID + incUsername
-	redisKeyAccess := Config.ConstRedisAPIAccessToken + incClientID + incUsername
-	//redisVal, errG := modules.RedisGet(redisClient, goContext, redisKey)
-	errR := modules.RedisDel(redisClient, goContext, redisKeyRefresh)
-	errA := modules.RedisDel(redisClient, goContext, redisKeyAccess)
-	if errR == nil && errA == nil {
-		//isRemoteIPValid := false
-		modules.DoLog("INFO", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Success delete redis: ", incClientID+incUsername)+".", true, nil)
-		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
-		//isStatus = false
-		status = "000"
-		statusDesc = "Success - Delete Token"
-
-	} else {
-		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Failed delete accesstoken redis: ", incClientID+incUsername)+". Error occur.", true, errR)
-		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Failed delete refreshtoken redis: ", incClientID+incUsername)+". Error occur.", true, errA)
-		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
-		//isStatus = false
-		status = "000"
-		statusDesc = "Failed - Delete token or already deleted"
-	}
-
-	return mapResponse, status, statusDesc
-}
+//func deleteToken(redisClient *redis.Client, goContext context.Context, incClientID string,
+//	incUsername string) (map[string]interface{}, string, string) {
+//
+//	mapResponse := make(map[string]interface{})
+//	//boolIsActive := false
+//
+//	//isStatus := false
+//	status := "400"
+//	statusDesc := "Failed"
+//
+//	redisKeyRefresh := Config.ConstRedisAPIRefreshToken + incClientID + incUsername
+//	redisKeyAccess := Config.ConstRedisAPIAccessToken + incClientID + incUsername
+//	//redisVal, errG := modules.RedisGet(redisClient, goContext, redisKey)
+//	errR := modules.RedisDel(redisClient, goContext, redisKeyRefresh)
+//	errA := modules.RedisDel(redisClient, goContext, redisKeyAccess)
+//	if errR == nil && errA == nil {
+//		//isRemoteIPValid := false
+//		modules.DoLog("INFO", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Success delete redis: ", incClientID+incUsername)+".", true, nil)
+//		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
+//		//isStatus = false
+//		status = "000"
+//		statusDesc = "Success - Delete Token"
+//
+//	} else {
+//		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Failed delete accesstoken redis: ", incClientID+incUsername)+". Error occur.", true, errR)
+//		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Failed delete refreshtoken redis: ", incClientID+incUsername)+". Error occur.", true, errA)
+//		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
+//		//isStatus = false
+//		status = "000"
+//		statusDesc = "Failed - Delete token or already deleted"
+//	}
+//
+//	return mapResponse, status, statusDesc
+//}
 
 func ProcessGetNewToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
@@ -385,52 +385,52 @@ func ProcessRefreshToken(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 	return incTraceCode, responseHeader, responseContent
 }
 
-func ProcessDeleteToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
-	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
-	responseHeader := make(map[string]string)
-	mapResponse := make(map[string]interface{})
-	mapResult := make(map[string]interface{})
-
-	statusDesc := "Failed"
-	respStatus := "900"
-	responseContent := ""
-	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
-
-	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
-		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
-
-	if len(mapIncoming) > 0 {
-
-		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
-			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
-
-		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
-
-		if len(incUsername) > 0 && len(incClientID) > 0 {
-			mapResult, respStatus, statusDesc = deleteToken(rc, cx, incClientID, incUsername)
-		} else {
-			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
-				"Request not valid", false, nil)
-			statusDesc = "Invalid Request - invalid body request"
-			respStatus = "103"
-		}
-	} else {
-		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
-			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
-		statusDesc = "Invalid Request - no body request"
-		respStatus = "103"
-	}
-
-	responseHeader["Content-Type"] = "application/json"
-
-	mapResponse["data"] = mapResult
-	mapResponse["description"] = statusDesc
-	mapResponse["status"] = respStatus
-	mapResponse["datetime"] = respDatetime
-
-	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
-
-	return incTraceCode, responseHeader, responseContent
-}
+//func ProcessDeleteToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+//	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+//
+//	responseHeader := make(map[string]string)
+//	mapResponse := make(map[string]interface{})
+//	mapResult := make(map[string]interface{})
+//
+//	statusDesc := "Failed"
+//	respStatus := "900"
+//	responseContent := ""
+//	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
+//
+//	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
+//		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
+//
+//	if len(mapIncoming) > 0 {
+//
+//		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
+//			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
+//
+//		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
+//		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
+//
+//		if len(incUsername) > 0 && len(incClientID) > 0 {
+//			mapResult, respStatus, statusDesc = deleteToken(rc, cx, incClientID, incUsername)
+//		} else {
+//			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
+//				"Request not valid", false, nil)
+//			statusDesc = "Invalid Request - invalid body request"
+//			respStatus = "103"
+//		}
+//	} else {
+//		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
+//			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+//		statusDesc = "Invalid Request - no body request"
+//		respStatus = "103"
+//	}
+//
+//	responseHeader["Content-Type"] = "application/json"
+//
+//	mapResponse["data"] = mapResult
+//	mapResponse["description"] = statusDesc
+//	mapResponse["status"] = respStatus
+//	mapResponse["datetime"] = respDatetime
+//
+//	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
+//
+//	return incTraceCode, responseHeader, responseContent
+//}

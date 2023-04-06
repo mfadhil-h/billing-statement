@@ -971,6 +971,95 @@
 					]
 				},
 				{
+					"name": "Get Cron Enum",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reqtype\": \"GET_ALL\",\r\n    \"username\": \"RUMIPEZSoupsRrLeWU\",\r\n    \"accesstoken\": \"dcd360bf992d48c2937d60562fa198a5\",\r\n    \"clientid\": \"RUMIPENDY466\",\r\n    \"formulaid\": \"RUMIPENDY466HITI80\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ip-server}}:31122/data-formula",
+							"host": [
+								"{{ip-server}}"
+							],
+							"port": "31122",
+							"path": [
+								"data-formula"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Cron Enum",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"reqtype\": \"SCHEDULE\",\r\n    \"username\": \"RUMIPEZSoupsRrLeWU\",\r\n    \"accesstoken\": \"e05a572a93dc48e59d68d50a60cfeff0\",\r\n    \"clientid\": \"RUMIPENDY466\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ip-server}}:31122/enum",
+									"host": [
+										"{{ip-server}}"
+									],
+									"port": "31122",
+									"path": [
+										"enum"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Accept",
+									"value": "application/json"
+								},
+								{
+									"key": "Access-Control-Allow-Headers",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Methods",
+									"value": "POST"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 06 Apr 2023 19:27:01 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "624"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"enum_id\": \"DAY\",\n            \"name_schedule\": \"Day\"\n        },\n        {\n            \"enum_id\": \"ENDMONTH\",\n            \"name_schedule\": \"Last day in Month\"\n        },\n        {\n            \"enum_id\": \"STARTMONTH\",\n            \"name_schedule\": \"First day in Month\"\n        },\n        {\n            \"enum_id\": \"REALTIME\",\n            \"name_schedule\": \"Realtime\"\n        },\n        {\n            \"enum_id\": \"SUNDAY\",\n            \"name_schedule\": \"Sunday\"\n        },\n        {\n            \"enum_id\": \"MONDAY\",\n            \"name_schedule\": \"Monday\"\n        },\n        {\n            \"enum_id\": \"TUESDAY\",\n            \"name_schedule\": \"Tuesday\"\n        },\n        {\n            \"enum_id\": \"WEDNESDAY\",\n            \"name_schedule\": \"Wednesday\"\n        },\n        {\n            \"enum_id\": \"THURSDAY\",\n            \"name_schedule\": \"Thursday\"\n        },\n        {\n            \"enum_id\": \"FRIDAY\",\n            \"name_schedule\": \"Friday\"\n        },\n        {\n            \"enum_id\": \"SATURDAY\",\n            \"name_schedule\": \"Saturday\"\n        }\n    ],\n    \"datetime\": \"2023-04-07 02:27:01\",\n    \"description\": \"\",\n    \"status\": \"000\"\n}"
+						}
+					]
+				},
+				{
 					"name": "Get All Formula",
 					"request": {
 						"method": "POST",
