@@ -3,7 +3,7 @@ package main
 import (
 	"billing/Config"
 	"billing/CoreApplication/APIClientHit/APICredential"
-	"billing/CoreApplication/APIClientHit/SendData"
+	"billing/CoreApplication/APIClientHit/APISendData"
 	"billing/modules"
 	"bytes"
 	"context"
@@ -27,7 +27,12 @@ var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
+const (
+	moduleName = "APICredential"
+)
+
 func loadCredentialToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
+	const functionName = "loadCredentialToRedis"
 
 	redisDelPattern := Config.ConstRedisAPIHitKey + "*"
 	modules.RedisDeleteKeysByPattern(rc, cx, redisDelPattern)
@@ -81,6 +86,7 @@ func loadCredentialToRedis(db *sql.DB, rc *redis.Client, cx context.Context) {
 }
 
 func main() {
+	const functionName = "main"
 	// Load configuration file
 	modules.InitiateGlobalVariables(Config.ConstProduction)
 	runtime.GOMAXPROCS(4)
@@ -94,7 +100,7 @@ func main() {
 	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
-		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
+		modules.DoLog("INFO", "", moduleName, functionName,
 			"Failed to connect to database server. Error!", true, errDB)
 		panic(errDB)
 	}
@@ -164,7 +170,7 @@ func main() {
 
 		incTraceCode := modules.GenerateUUID()
 		// Generate traceCode
-		modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			"Assigning TraceCode: "+incTraceCode, false, nil)
 
 		incURL := fmt.Sprintf("%s", r.URL)[1:]
@@ -181,7 +187,7 @@ func main() {
 
 			// Write back the buffer to Body context, so it can be used by later process
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"Incoming request: "+incomingBody, false, nil)
 
 			remoteIPAddress := modules.GetIPAddress(r.RemoteAddr)
@@ -196,20 +202,18 @@ func main() {
 
 			// Route the request
 			if incURL == "send" {
-				_, responseHeader, responseContent = SendData.Process(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+				_, responseHeader, responseContent = APISendData.SendDataProcess(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 			} else if incURL == "token" {
 				if strings.ToUpper(incReqType) == "GET_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessGetNewToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APICredential.GetNewTokenProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "REFRESH_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessRefreshToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
-				} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APICredential.RefreshTokenProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 
 			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
 
-			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"responseHeader: "+fmt.Sprintf("%+v", responseHeader)+", responseContent: "+responseContent,
 				false, nil)
 		}

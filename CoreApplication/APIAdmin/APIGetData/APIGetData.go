@@ -12,7 +12,12 @@ import (
 	"time"
 )
 
+const (
+	moduleName = "APIGetData"
+)
+
 func getAllFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) (string, string, []map[string]interface{}) {
+	const functionName = "getAllFormulaDataFromMongo"
 	var mapReturns []map[string]interface{}
 	responseStatus := "000"
 	responseDesc := "Success"
@@ -24,11 +29,16 @@ func getAllFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, inc
 
 	collection := dbMongo.Collection(collectionName)
 	filter := bson.D{{Key: "formula_id", Value: incFormulaID}}
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+		fmt.Sprintf("mapIncoming: %+v, collectionName: %+v, filter: %+v", mapIncoming, collectionName, filter),
+		false, nil)
 
 	cursor, errC := collection.Find(cx, filter)
 	if errC != nil {
 		responseStatus = "400"
 		responseDesc = "Data not found - filter problem"
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+			"Failed to find tables. Error occur.", true, errC)
 		panic(errC)
 	}
 	//var results []map[string]interface{}
@@ -36,12 +46,15 @@ func getAllFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, inc
 	if errC != nil {
 		responseStatus = "400"
 		responseDesc = "Data not found - data empty"
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+			"Failed to cursor all tables. Error occur.", true, errC)
 		panic(errC)
 	}
 	return responseStatus, responseDesc, mapReturns
 }
 
 func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
+	const functionName = "getOneFormulaDataFromPostgres"
 	mapReturn := make(map[string]interface{})
 	responseStatus := "400"
 
@@ -56,7 +69,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 	rows, err := dbPostgres.Query(query, incFormulaID, incDataID)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 
@@ -79,7 +92,7 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 				&dataReceiveDatetime, &dataProcessDatetime, &dataReceiveCode, &isProcess)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -111,8 +124,9 @@ func getOneFormulaDataFromPostgres(dbPostgres *sql.DB, incTraceCode string, mapI
 	return responseStatus, mapReturn
 }
 
-func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *redis.Client, cx context.Context, incTraceCode string,
+func GetAllProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "GetAllProcess"
 
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
@@ -128,12 +142,12 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -207,19 +221,19 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 					statusDesc = "Data empty"
 				}
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				statusDesc = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
@@ -238,23 +252,24 @@ func ProcessGetAll(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 }
 
 func getOneFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) (string, string, []map[string]interface{}) {
+	const functionName = "getOneFormulaDataFromMongo"
 	var mapReturns []map[string]interface{}
 	responseStatus := "000"
 	responseDesc := "Success"
-	modules.DoLog("INFO", incTraceCode, "APIGetData", "getOneFormulaDataFromMongo",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	incDataID := modules.GetStringFromMapInterface(mapIncoming, "dataid")
-	modules.DoLog("INFO", incTraceCode, "APIGetData", "getOneFormulaDataFromMongo",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		fmt.Sprintf("incClientID: %+v", incClientID)+", "+fmt.Sprintf("incFormulaID: %+v", incFormulaID)+
 			", "+fmt.Sprintf("incDataID: %+v", incDataID), false, nil)
 	collectionName := incClientID + "_" + incFormulaID
 
 	collection := dbMongo.Collection(collectionName)
 	filter := bson.D{{Key: "formula_id", Value: incFormulaID}, {Key: "data_id", Value: incDataID}}
-	modules.DoLog("INFO", incTraceCode, "APIGetData", "getOneFormulaDataFromMongo",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		fmt.Sprintf("filter: %+v", filter), false, nil)
 
 	cursor, errC := collection.Find(cx, filter)
@@ -272,8 +287,9 @@ func getOneFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, inc
 	return responseStatus, responseDesc, mapReturns
 }
 
-func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *redis.Client, cx context.Context, incTraceCode string,
+func GetByIdProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "GetByIdProcess"
 
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
@@ -289,12 +305,12 @@ func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
@@ -318,7 +334,7 @@ func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 					mapDataResults["fields"] = make([]map[string]interface{}, 0, 0)
 					mapDataResults["formula_name"] = ""
 				}
-				modules.DoLog("INFO", incTraceCode, "APIGetData", "ProcessGetById",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					fmt.Sprintf("mongoResults: %+v", mongoResults), false, nil)
 				if len(mongoResults) > 0 {
 					for _, mongoResult := range mongoResults {
@@ -369,19 +385,19 @@ func ProcessGetById(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 					statusDesc = "Data empty"
 				}
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				statusDesc = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"

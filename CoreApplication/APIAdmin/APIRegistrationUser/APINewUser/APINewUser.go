@@ -9,8 +9,12 @@ import (
 	"time"
 )
 
-func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string, string, string) {
+const (
+	moduleName = "APINewUser"
+)
 
+func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string, string, string) {
+	const functionName = "saveToDatabase"
 	isSuccess := false
 
 	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
@@ -28,27 +32,27 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 		incPassword, incKey, incRemoteIP, incTimeNow, true)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 		// Success
 		rowAffected, _ := result.RowsAffected()
 		if rowAffected >= 0 {
 			isSuccess = true
-			modules.DoLog("INFO", incTraceCode, "API", "Formula",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"Success to insert tables.", true, nil)
 		} else {
 			isSuccess = false
-			modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Failed to insert tables. Error occur.", true, err)
 		}
 	}
 	return isSuccess, incUsername, incPassword, incKey
 }
 
-func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
+func NewAPIUserProcess(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
+	const functionName = "NewAPIUserProcess"
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
 	responseHeader := make(map[string]string)
@@ -61,12 +65,12 @@ func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, in
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -87,12 +91,12 @@ func Process(db *sql.DB, redisClient *redis.Client, contextX context.Context, in
 				respStatus = "900"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		respStatus = "103"
 	}

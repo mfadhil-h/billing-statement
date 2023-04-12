@@ -1,4 +1,4 @@
-package SendData
+package APISendData
 
 import (
 	"billing/modules"
@@ -10,9 +10,13 @@ import (
 	"time"
 )
 
-func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string,
-	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+const (
+	moduleName = "APISendData"
+)
 
+func SendDataProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string,
+	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "SendDataProcess"
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
 	responseHeader := make(map[string]string)
@@ -24,12 +28,12 @@ func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		/* TEMP REMOVE AUTH FOR TEST */
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
@@ -56,19 +60,19 @@ func Process(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Client, cx c
 					respStatus = "900"
 				}
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				respDescription = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			respDescription = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		respDescription = "Invalid Request - no body request"
 		respStatus = "103"

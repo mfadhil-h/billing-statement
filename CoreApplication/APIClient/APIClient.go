@@ -32,8 +32,13 @@ var dbMongo *mongo.Database
 var rc *redis.Client
 var cx context.Context
 
+const (
+	moduleName = "APIClient"
+)
+
 func main() {
 	// Load configuration file
+	const functionName = "main"
 	modules.InitiateGlobalVariables(Config.ConstProduction)
 	runtime.GOMAXPROCS(4)
 
@@ -46,7 +51,7 @@ func main() {
 	dbPostgres, errDB = sql.Open("postgres", psqlInfo) // dbPostgres udah di defined diatas, jadi harus pake = bukan :=
 
 	if errDB != nil {
-		modules.DoLog("INFO", "", "ProfileGRPCServer", "main",
+		modules.DoLog("INFO", "", moduleName, functionName,
 			"Failed to connect to database server. Error!", true, errDB)
 		panic(errDB)
 	}
@@ -110,10 +115,13 @@ func main() {
 
 		incTraceCode := modules.GenerateUUID()
 		// Generate traceCode
-		modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			"Assigning TraceCode: "+incTraceCode, false, nil)
 
 		incURL := fmt.Sprintf("%s", r.URL)[1:]
+
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+			"incURL: "+fmt.Sprintf("%+v", incURL), false, nil)
 
 		if r.Body != nil && r.Method == "POST" {
 			bodyBytes, _ = ioutil.ReadAll(r.Body)
@@ -127,7 +135,7 @@ func main() {
 
 			// Write back the buffer to Body context, so it can be used by later process
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
-			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"Incoming request: "+incomingBody, false, nil)
 
 			remoteIPAddress := modules.GetIPAddress(r.RemoteAddr)
@@ -143,39 +151,37 @@ func main() {
 			// Route the request
 			if incURL == "formula" {
 				if strings.ToUpper(incReqType) == "NEW" {
-					_, responseHeader, responseContent = APINewFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APINewFormula.NewFormulaProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "UPDATE" {
-					_, responseHeader, responseContent = APIUpdateFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIUpdateFormula.UpdateProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "ACTIVE" || strings.ToUpper(incReqType) == "DEACTIVE" {
-					_, responseHeader, responseContent = APIActivateFormula.Process(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIActivateFormula.ActivateProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "GET_ALL" {
-					_, responseHeader, responseContent = APIGetFormula.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIGetFormula.GetAllProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
-					_, responseHeader, responseContent = APIGetFormula.ProcessGetById(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIGetFormula.GetByIdProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			} else if incURL == "data-formula" {
 				if strings.ToUpper(incReqType) == "GET_ALL" {
-					_, responseHeader, responseContent = APIGetData.ProcessGetAll(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIGetData.GetAllProcess(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "GET_BY_ID" {
-					_, responseHeader, responseContent = APIGetData.ProcessGetById(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIGetData.GetByIdProcess(dbPostgres, dbMongo, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			} else if incURL == "token" {
 				if strings.ToUpper(incReqType) == "GET_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessGetNewToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APICredential.GetNewTokenProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				} else if strings.ToUpper(incReqType) == "REFRESH_TOKEN" {
-					_, responseHeader, responseContent = APICredential.ProcessRefreshToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
-					//} else if strings.ToUpper(incReqType) == "DELETE_TOKEN" {
-					//	_, responseHeader, responseContent = APICredential.ProcessDeleteToken(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APICredential.RefreshTokenProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			} else if incURL == "enum" {
 				if strings.ToUpper(incReqType) == "SCHEDULE" {
-					_, responseHeader, responseContent = APIEnum.ProcessGetAll(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
+					_, responseHeader, responseContent = APIEnum.GetAllProcess(dbPostgres, rc, cx, incTraceCode, incomingHeader, mapIncoming, remoteIPAddress)
 				}
 			}
 
 			//modules.SaveIncomingResponse(dbPostgres, tracecodeX, responseHeader, responseContent)
 
-			modules.DoLog("INFO", incTraceCode, "MAIN", "API",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"responseHeader: "+fmt.Sprintf("%+v", responseHeader)+", responseContent: "+responseContent,
 				false, nil)
 		}

@@ -10,7 +10,12 @@ import (
 	"time"
 )
 
+const (
+	moduleName = "APIEnum"
+)
+
 func getEnumFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, []map[string]interface{}) {
+	const functionName = "getEnumFromPostgres"
 	var mapReturns []map[string]interface{}
 	responseStatus := "400"
 
@@ -21,7 +26,7 @@ func getEnumFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string
 	rows, err := db.Query(query)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to select tables. Error occur.", true, err)
 	} else {
 
@@ -36,7 +41,7 @@ func getEnumFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string
 			errS := rows.Scan(&enumId, &nameSchedule)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -53,9 +58,9 @@ func getEnumFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string
 	return responseStatus, mapReturns
 }
 
-func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
+	const functionName = "GetAllProcess"
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
 	responseHeader := make(map[string]string)
@@ -67,12 +72,12 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -86,19 +91,19 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 			if isCredentialValid {
 				respStatus, results = getEnumFromPostgres(db, incTraceCode, mapIncoming)
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				statusDesc = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"

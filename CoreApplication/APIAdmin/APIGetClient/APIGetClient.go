@@ -9,7 +9,12 @@ import (
 	"time"
 )
 
+const (
+	moduleName = "APIGetClient"
+)
+
 func getAllClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, []map[string]interface{}) {
+	const functionName = "getAllClientFromPostgres"
 	var mapReturns []map[string]interface{}
 	responseStatus := "400"
 
@@ -22,7 +27,7 @@ func getAllClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 	rows, err := db.Query(query, true)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 
@@ -53,7 +58,7 @@ func getAllClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 				&clientCreateDatetime, &clientUpdateDatetime, &isActive)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -98,8 +103,9 @@ func getAllClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 	return responseStatus, mapReturns
 }
 
-func ProcessGetAll(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
+func GetAllProcess(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "GetAllProcess"
 
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
@@ -111,12 +117,12 @@ func ProcessGetAll(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -125,12 +131,12 @@ func ProcessGetAll(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 		if len(incUsername) > 0 && len(incPassword) > 0 {
 			respStatus, results = getAllClientFromPostgres(db, incTraceCode, mapIncoming)
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		respStatus = "103"
 	}
@@ -147,6 +153,7 @@ func ProcessGetAll(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 }
 
 func getOneClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
+	const functionName = "getOneClientFromPostgres"
 	mapReturn := make(map[string]interface{})
 	responseStatus := "400"
 
@@ -161,7 +168,7 @@ func getOneClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 	rows, err := db.Query(query, incClientID, true)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 
@@ -191,7 +198,7 @@ func getOneClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 				&clientCreateDatetime, &clientUpdateDatetime, &isActive)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -235,8 +242,9 @@ func getOneClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[s
 	return responseStatus, mapReturn
 }
 
-func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
+func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "GetByIdProcess"
 
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
@@ -249,12 +257,12 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -265,13 +273,13 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 
 			respStatus, results = getOneClientFromPostgres(db, incTraceCode, mapIncoming)
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"

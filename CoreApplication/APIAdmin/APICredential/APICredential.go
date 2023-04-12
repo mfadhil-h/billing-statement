@@ -11,8 +11,13 @@ import (
 	"time"
 )
 
-func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Context, incClientID string,
+const (
+	moduleName = "APICredential"
+)
+
+func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Context, incTraceCode string, incClientID string,
 	incUsername string, incPassword string, incRemoteIPAddress string) (map[string]interface{}, string, string) {
+	const functionName = "createNewToken"
 
 	mapResponse := make(map[string]interface{})
 	strClientID := ""
@@ -101,28 +106,28 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 								statusDesc = "Failed - Create access token"
 							}
 						} else {
-							modules.DoLog("INFO", "", "APICredential", "createNewToken",
+							modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 								"Failed User's password is unmatched. Error occur.", false, nil)
 							//return status and desc is failed password
 							status = "400"
 							statusDesc = "Failed - User's password is unmatched"
 						}
 					} else {
-						modules.DoLog("INFO", "", "APICredential", "createNewToken",
+						modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 							"Failed User's IP not whitelisted. Error occur.", false, nil)
 						//return status and desc is failed password
 						status = "400"
 						statusDesc = "Failed - User's IP not whitelisted"
 					}
 				} else {
-					modules.DoLog("INFO", "", "APICredential", "createNewToken",
+					modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 						"Failed User is inactive. Error occur.", false, nil)
 					//return status and desc is inactive
 					status = "400"
 					statusDesc = "Failed - User is inactive"
 				}
 			} else {
-				modules.DoLog("ERROR", "", "APICredential", "createNewToken",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				status = "400"
 				statusDesc = "Failed - Read database"
@@ -130,7 +135,7 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 		}
 	} else {
 		// Database Error
-		modules.DoLog("ERROR", "", "APICredential", "createNewToken",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to read database. Error occur.", true, err)
 		status = "400"
 		statusDesc = "Failed - Read database or not Found"
@@ -139,8 +144,9 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 	return mapResponse, status, statusDesc
 }
 
-func updateNewToken(redisClient *redis.Client, goContext context.Context, incClientID string,
+func updateNewToken(redisClient *redis.Client, goContext context.Context, incTraceCode string, incClientID string,
 	incUsername string, incRefreshToken string, incRemoteIPAddress string) (map[string]interface{}, string, string) {
+	const functionName = "updateNewToken"
 
 	mapResponse := make(map[string]interface{})
 	strClientID := ""
@@ -197,14 +203,14 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incCli
 					fmt.Println(redisKeyRefresh)
 					errR := modules.RedisSet(redisClient, goContext, redisKeyRefresh, redisValRefreshToken, 1*time.Hour)
 					if errR == nil {
-						modules.DoLog("INFO", "", "APICredential", "updateNewToken",
+						modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 							fmt.Sprintln("Success save Refresh: ", strClientID+strUsername)+". Error occur.", false, nil)
 						//fmt.Println("Success save Refresh: ", strClientID+strUsername)
 						//isStatus = true
 						status = "000"
 						statusDesc = "Success"
 					} else {
-						modules.DoLog("ERROR", "", "APICredential", "updateNewToken",
+						modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 							fmt.Sprintln("Failed save Access: ", strClientID+strUsername)+". Error occur.", true, errR)
 						//fmt.Println("Failed save Access: ", strClientID+strUsername)
 						//isStatus = false
@@ -213,28 +219,28 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incCli
 					}
 				} else {
 					//isStatus = false
-					modules.DoLog("ERROR", "", "APICredential", "updateNewToken",
+					modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 						fmt.Sprintln("Failed save Access: ", strClientID+strUsername)+". Error occur.", true, errA)
 					//fmt.Println("Failed save Access: ", strClientID+strUsername)
 					status = "400"
 					statusDesc = "Failed - Create access token"
 				}
 			} else {
-				modules.DoLog("INFO", "", "APICredential", "updateNewToken",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed User's refresh is unmatched.", false, nil)
 				//return status and desc is failed password
 				status = "400"
 				statusDesc = "Failed - User's refresh is unmatched or not found"
 			}
 		} else {
-			modules.DoLog("INFO", "", "APICredential", "updateNewToken",
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 				"Failed User's IP not whitelisted.", false, nil)
 			//return status and desc is failed password
 			status = "400"
 			statusDesc = "Failed - User's IP not whitelisted"
 		}
 	} else {
-		modules.DoLog("ERROR", "", "APICredential", "updateNewToken",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			fmt.Sprintln("Failed get redis: ", strClientID+strUsername)+". Error occur.", true, errG)
 		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
 		//isStatus = false
@@ -245,46 +251,47 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incCli
 	return mapResponse, status, statusDesc
 }
 
-func deleteToken(redisClient *redis.Client, goContext context.Context, incClientID string,
-	incUsername string) (map[string]interface{}, string, string) {
+//func deleteToken(redisClient *redis.Client, goContext context.Context, incClientID string,
+//	incUsername string) (map[string]interface{}, string, string) {
+//
+//	mapResponse := make(map[string]interface{})
+//	//boolIsActive := false
+//
+//	//isStatus := false
+//	status := "400"
+//	statusDesc := "Failed"
+//
+//	redisKeyRefresh := Config.ConstRedisAPIRefreshToken + incClientID + incUsername
+//	redisKeyAccess := Config.ConstRedisAPIAccessToken + incClientID + incUsername
+//	//redisVal, errG := modules.RedisGet(redisClient, goContext, redisKey)
+//	errR := modules.RedisDel(redisClient, goContext, redisKeyRefresh)
+//	errA := modules.RedisDel(redisClient, goContext, redisKeyAccess)
+//	if errR == nil && errA == nil {
+//		//isRemoteIPValid := false
+//		modules.DoLog("INFO", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Success delete redis: ", incClientID+incUsername)+".", true, nil)
+//		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
+//		//isStatus = false
+//		status = "000"
+//		statusDesc = "Success - Delete Token"
+//
+//	} else {
+//		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Failed delete accesstoken redis: ", incClientID+incUsername)+". Error occur.", true, errR)
+//		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
+//			fmt.Sprintln("Failed delete refreshtoken redis: ", incClientID+incUsername)+". Error occur.", true, errA)
+//		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
+//		//isStatus = false
+//		status = "000"
+//		statusDesc = "Failed - Delete token or already deleted"
+//	}
+//
+//	return mapResponse, status, statusDesc
+//}
 
-	mapResponse := make(map[string]interface{})
-	//boolIsActive := false
-
-	//isStatus := false
-	status := "400"
-	statusDesc := "Failed"
-
-	redisKeyRefresh := Config.ConstRedisAPIRefreshToken + incClientID + incUsername
-	redisKeyAccess := Config.ConstRedisAPIAccessToken + incClientID + incUsername
-	//redisVal, errG := modules.RedisGet(redisClient, goContext, redisKey)
-	errR := modules.RedisDel(redisClient, goContext, redisKeyRefresh)
-	errA := modules.RedisDel(redisClient, goContext, redisKeyAccess)
-	if errR == nil && errA == nil {
-		//isRemoteIPValid := false
-		modules.DoLog("INFO", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Success delete redis: ", incClientID+incUsername)+".", true, nil)
-		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
-		//isStatus = false
-		status = "000"
-		statusDesc = "Success - Delete Token"
-
-	} else {
-		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Failed delete accesstoken redis: ", incClientID+incUsername)+". Error occur.", true, errR)
-		modules.DoLog("ERROR", "", "APICredential", "deleteToken",
-			fmt.Sprintln("Failed delete refreshtoken redis: ", incClientID+incUsername)+". Error occur.", true, errA)
-		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
-		//isStatus = false
-		status = "000"
-		statusDesc = "Failed - Delete token or already deleted"
-	}
-
-	return mapResponse, status, statusDesc
-}
-
-func ProcessGetNewToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+func GetNewTokenProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "GetNewTokenProcess"
 
 	responseHeader := make(map[string]string)
 	mapResponse := make(map[string]interface{})
@@ -295,12 +302,12 @@ func ProcessGetNewToken(db *sql.DB, rc *redis.Client, cx context.Context, incTra
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessGetNewToken",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessGetNewToken",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -308,15 +315,15 @@ func ProcessGetNewToken(db *sql.DB, rc *redis.Client, cx context.Context, incTra
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 
 		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 {
-			mapResult, respStatus, statusDesc = createNewToken(db, rc, cx, incClientID, incUsername, incPassword, incRemoteIPAddress)
+			mapResult, respStatus, statusDesc = createNewToken(db, rc, cx, incTraceCode, incClientID, incUsername, incPassword, incRemoteIPAddress)
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessGetNewToken",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessGetNewToken",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
@@ -334,8 +341,9 @@ func ProcessGetNewToken(db *sql.DB, rc *redis.Client, cx context.Context, incTra
 	return incTraceCode, responseHeader, responseContent
 }
 
-func ProcessRefreshToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+func RefreshTokenProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+	const functionName = "RefreshTokenProcess"
 
 	responseHeader := make(map[string]string)
 	mapResponse := make(map[string]interface{})
@@ -346,12 +354,12 @@ func ProcessRefreshToken(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessRefreshToken",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessRefreshToken",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -359,15 +367,15 @@ func ProcessRefreshToken(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 
 		if len(incUsername) > 0 && len(incRefreshToken) > 0 && len(incClientID) > 0 {
-			mapResult, respStatus, statusDesc = updateNewToken(rc, cx, incClientID, incUsername, incRefreshToken, incRemoteIPAddress)
+			mapResult, respStatus, statusDesc = updateNewToken(rc, cx, incTraceCode, incClientID, incUsername, incRefreshToken, incRemoteIPAddress)
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessRefreshToken",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessRefreshToken",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
@@ -385,52 +393,52 @@ func ProcessRefreshToken(db *sql.DB, rc *redis.Client, cx context.Context, incTr
 	return incTraceCode, responseHeader, responseContent
 }
 
-func ProcessDeleteToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
-	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
-	responseHeader := make(map[string]string)
-	mapResponse := make(map[string]interface{})
-	mapResult := make(map[string]interface{})
-
-	statusDesc := "Failed"
-	respStatus := "900"
-	responseContent := ""
-	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
-
-	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
-		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
-
-	if len(mapIncoming) > 0 {
-
-		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
-			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
-
-		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
-
-		if len(incUsername) > 0 && len(incClientID) > 0 {
-			mapResult, respStatus, statusDesc = deleteToken(rc, cx, incClientID, incUsername)
-		} else {
-			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
-				"Request not valid", false, nil)
-			statusDesc = "Invalid Request - invalid body request"
-			respStatus = "103"
-		}
-	} else {
-		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
-			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
-		statusDesc = "Invalid Request - no body request"
-		respStatus = "103"
-	}
-
-	responseHeader["Content-Type"] = "application/json"
-
-	mapResponse["data"] = mapResult
-	mapResponse["description"] = statusDesc
-	mapResponse["status"] = respStatus
-	mapResponse["datetime"] = respDatetime
-
-	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
-
-	return incTraceCode, responseHeader, responseContent
-}
+//func ProcessDeleteToken(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+//	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
+//
+//	responseHeader := make(map[string]string)
+//	mapResponse := make(map[string]interface{})
+//	mapResult := make(map[string]interface{})
+//
+//	statusDesc := "Failed"
+//	respStatus := "900"
+//	responseContent := ""
+//	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
+//
+//	modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
+//		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
+//
+//	if len(mapIncoming) > 0 {
+//
+//		modules.DoLog("INFO", incTraceCode, "APICredential", "ProcessDeleteToken",
+//			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
+//
+//		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
+//		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
+//
+//		if len(incUsername) > 0 && len(incClientID) > 0 {
+//			mapResult, respStatus, statusDesc = deleteToken(rc, cx, incClientID, incUsername)
+//		} else {
+//			modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
+//				"Request not valid", false, nil)
+//			statusDesc = "Invalid Request - invalid body request"
+//			respStatus = "103"
+//		}
+//	} else {
+//		modules.DoLog("ERROR", incTraceCode, "APICredential", "ProcessDeleteToken",
+//			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+//		statusDesc = "Invalid Request - no body request"
+//		respStatus = "103"
+//	}
+//
+//	responseHeader["Content-Type"] = "application/json"
+//
+//	mapResponse["data"] = mapResult
+//	mapResponse["description"] = statusDesc
+//	mapResponse["status"] = respStatus
+//	mapResponse["datetime"] = respDatetime
+//
+//	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
+//
+//	return incTraceCode, responseHeader, responseContent
+//}

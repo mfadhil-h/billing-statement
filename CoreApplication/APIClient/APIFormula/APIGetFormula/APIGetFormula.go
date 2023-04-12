@@ -11,7 +11,12 @@ import (
 	"time"
 )
 
+const (
+	moduleName = "APIGetFormula"
+)
+
 func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, []map[string]interface{}) {
+	const functionName = "getAllFormulaClientFromPostgres"
 	var mapReturns []map[string]interface{}
 	responseStatus := "400"
 
@@ -26,7 +31,7 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 	rows, err := db.Query(query, incClientID)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 
@@ -50,7 +55,7 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 				&formulaTime, &formulaCreateDatetime, &formulaUpdateDatetime, &isActive)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -82,7 +87,7 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 					if len(arrFormulas[x]) > 1 && len(arrContent) > 1 {
 						incID := arrContent[0]
 						incParameter := strings.TrimLeft(strings.TrimRight(arrContent[1], " "), " ")
-						modules.DoLog("INFO", "", "LandingGRPC", "Package",
+						modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 							"getOneFormula: "+fmt.Sprintf("incID: %+v", incID)+fmt.Sprintf(", incParameter: %+v", incParameter), false, nil)
 
 						if strings.ToUpper(incID) == "STRING" {
@@ -140,9 +145,9 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 	return responseStatus, mapReturns
 }
 
-func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
+func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
+	const functionName = "GetAllProcess"
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
 	responseHeader := make(map[string]string)
@@ -154,12 +159,12 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -173,19 +178,19 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 			if isCredentialValid {
 				respStatus, results = getAllFormulaClientFromPostgres(db, incTraceCode, mapIncoming)
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				statusDesc = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
@@ -204,6 +209,7 @@ func ProcessGetAll(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 }
 
 func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
+	const functionName = "GetOneFormulaFromPostgres"
 	mapReturn := make(map[string]interface{})
 	responseStatus := "400"
 
@@ -219,7 +225,7 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 	rows, err := db.Query(query, incFormulaID, incClientID)
 
 	if err != nil {
-		modules.DoLog("ERROR", incTraceCode, "API", "Formula",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
 	} else {
 
@@ -242,7 +248,7 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 				&formulaTime, &formulaCreateDatetime, &formulaUpdateDatetime, &isActive)
 
 			if errS != nil {
-				modules.DoLog("INFO", "", "LandingGRPC", "Package",
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
@@ -274,7 +280,7 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 					if len(arrFormulas[x]) > 1 && len(arrContent) > 1 {
 						incID := arrContent[0]
 						incParameter := strings.TrimLeft(strings.TrimRight(arrContent[1], " "), " ")
-						modules.DoLog("INFO", "", "LandingGRPC", "Package",
+						modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 							"getOneFormula: "+fmt.Sprintf("incID: %+v", incID)+fmt.Sprintf(", incParameter: %+v", incParameter), false, nil)
 
 						if strings.ToUpper(incID) == "STRING" {
@@ -331,9 +337,9 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 	return responseStatus, mapReturn
 }
 
-func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
+func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
 	incIncomingHeader map[string]interface{}, mapIncoming map[string]interface{}, incRemoteIPAddress string) (string, map[string]string, string) {
-
+	const functionName = "GetByIdProcess"
 	//incAuthID := modules.GetStringFromMapInterface(incIncomingHeader, "x-data")
 
 	responseHeader := make(map[string]string)
@@ -345,12 +351,12 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
-	modules.DoLog("INFO", incTraceCode, "API", "Auth",
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		"incomingMessage: "+incTraceCode+", remoteIPAddress: "+incRemoteIPAddress, false, nil)
 
 	if len(mapIncoming) > 0 {
 
-		modules.DoLog("INFO", incTraceCode, "API", "Auth",
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
@@ -366,19 +372,19 @@ func ProcessGetById(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 
 				respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
 			} else {
-				modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
 				statusDesc = "Invalid Request - token is invalid"
 				respStatus = "103"
 			}
 		} else {
-			modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
 			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
-		modules.DoLog("ERROR", incTraceCode, "API", "Auth",
+		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
 		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
