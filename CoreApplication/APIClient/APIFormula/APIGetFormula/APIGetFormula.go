@@ -15,14 +15,13 @@ const (
 	moduleName = "APIGetFormula"
 )
 
-func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, []map[string]interface{}) {
+func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) (string, string, []map[string]interface{}) {
 	const functionName = "getAllFormulaClientFromPostgres"
 	var mapReturns []map[string]interface{}
 	responseStatus := "400"
+	responseDesc := "Error - Empty"
 
 	//isSuccess := false
-
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 
 	query := `SELECT formula_id, client_id, formula_name, fields, formula, formula_type, formula_time, 
         formula_create_datetime, formula_update_datetime, is_active FROM yformula_v3 
@@ -33,11 +32,18 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 	if err != nil {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
+		responseStatus = "901"
 	} else {
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+			"success query: "+fmt.Sprintf("query: %+v", query)+fmt.Sprintf("incClientID: %+v", incClientID), false, nil)
+		responseStatus = "000"
+		responseDesc = "Empty Data"
 
 		defer rows.Close()
 
 		for rows.Next() {
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+				"start: "+fmt.Sprintf("rows: %+v", rows), false, nil)
 			mapReturn := make(map[string]interface{})
 
 			var formulaId sql.NullString
@@ -59,6 +65,8 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+					"success scan: "+fmt.Sprintf("clientId: %+v", clientId), false, nil)
 				responseStatus = "000"
 				strClientId := modules.ConvertSQLNullStringToString(clientId)
 				strFormulaId := modules.ConvertSQLNullStringToString(formulaId)
@@ -141,8 +149,14 @@ func getAllFormulaClientFromPostgres(db *sql.DB, incTraceCode string, mapIncomin
 			}
 			mapReturns = append(mapReturns, mapReturn)
 		}
+
+		if len(mapReturns) > 0 {
+			responseDesc = "Success"
+		} else {
+			mapReturns = make([]map[string]interface{}, 0)
+		}
 	}
-	return responseStatus, mapReturns
+	return responseDesc, responseStatus, mapReturns
 }
 
 func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string,
@@ -169,14 +183,13 @@ func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
-				respStatus, results = getAllFormulaClientFromPostgres(db, incTraceCode, mapIncoming)
+				statusDesc, respStatus, results = getAllFormulaClientFromPostgres(db, incTraceCode, mapIncoming, incClientID)
 			} else {
 				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
@@ -202,20 +215,21 @@ func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	mapResponse["data"] = results
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 
 	return incTraceCode, responseHeader, responseContent
 }
 
-func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (string, map[string]interface{}) {
+func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) (string, string, map[string]interface{}) {
 	const functionName = "GetOneFormulaFromPostgres"
 	mapReturn := make(map[string]interface{})
 	responseStatus := "400"
+	responseDesc := "Error - Empty"
 
 	//isSuccess := false
 
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
 	query := `SELECT formula_id, client_id, formula_name, fields, formula, formula_type, formula_time, 
@@ -227,11 +241,18 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 	if err != nil {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"Failed to insert tables. Error occur.", true, err)
+		responseStatus = "901"
 	} else {
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+			"success query: "+fmt.Sprintf("query: %+v", query), false, nil)
+		responseStatus = "000"
+		responseDesc = "Empty Data"
 
 		defer rows.Close()
 
 		for rows.Next() {
+			modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+				"start: "+fmt.Sprintf("rows: %+v", rows), false, nil)
 
 			var formulaId sql.NullString
 			var clientId sql.NullString
@@ -252,6 +273,8 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 					"Failed to read database. Error occur.", true, errS)
 				responseStatus = "901"
 			} else {
+				modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+					"success scan: "+fmt.Sprintf("clientId: %+v", clientId), false, nil)
 				responseStatus = "000"
 				strClientId := modules.ConvertSQLNullStringToString(clientId)
 				strFormulaId := modules.ConvertSQLNullStringToString(formulaId)
@@ -287,7 +310,6 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 							rawParameter := strings.Split(incParameter, "=")
 
 							for y := 0; y < len(rawParameter); y++ {
-
 								if y == 0 {
 									rawResults := strings.TrimLeft(strings.TrimRight(rawParameter[0], " "), " ")
 									strInsertAsResultString = append(strInsertAsResultString, rawResults)
@@ -333,8 +355,14 @@ func GetOneFormulaFromPostgres(db *sql.DB, incTraceCode string, mapIncoming map[
 				mapReturn["is_active"] = boolIsActive
 			}
 		}
+
+		if len(mapReturn) > 0 {
+			responseDesc = "Success"
+		} else {
+			mapReturn = make(map[string]interface{})
+		}
 	}
-	return responseStatus, mapReturn
+	return responseDesc, responseStatus, mapReturn
 }
 
 func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Context, incTraceCode string,
@@ -361,16 +389,15 @@ func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(redisClient, contextX, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(redisClient, contextX, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
 
-				respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming)
+				statusDesc, respStatus, results = GetOneFormulaFromPostgres(db, incTraceCode, mapIncoming, incClientID)
 			} else {
 				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 					"Request not valid", false, nil)
@@ -396,6 +423,7 @@ func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 	mapResponse["description"] = statusDesc
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

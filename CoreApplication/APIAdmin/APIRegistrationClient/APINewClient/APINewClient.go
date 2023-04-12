@@ -126,6 +126,7 @@ func NewClientProcess(db *sql.DB, redisClient *redis.Client, contextX context.Co
 	mapResponse["clientid"] = respClientID
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

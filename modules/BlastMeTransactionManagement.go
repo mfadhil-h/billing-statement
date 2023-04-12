@@ -704,12 +704,11 @@ func TransactionMgmtInsertTransactionFinancial(messageId string, db *sql.DB, usa
 	return isSuccess
 }
 
-func SaveDataBillingIntoMongo(db *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) bool {
+func SaveDataBillingIntoMongo(db *mongo.Database, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) bool {
 
 	var incDatas []map[string]interface{}
 	//isSuccess := true
 
-	incClientID := GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := GetStringFromMapInterface(mapIncoming, "formulaid")
 	collectionName := incClientID + "_" + incFormulaID
 	//incProcessID := modules.GenerateUUID()
@@ -832,12 +831,10 @@ func SaveFormulaBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[s
 	return isSuccess, incFormulaID
 }
 
-func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) (bool, string, string) {
+func SaveFormulaArrayBillingIntoPg(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) (bool, string, string) {
 
 	isSuccess := false
 	strFormula := ""
-
-	incClientID := GetStringFromMapInterface(mapIncoming, "clientid")
 
 	incFields := mapIncoming["fields"].([]interface{})
 	var arrFields []string

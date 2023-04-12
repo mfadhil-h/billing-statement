@@ -39,13 +39,10 @@ func NewFormulaProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTrac
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		/* TEMP REMOVE AUTH FOR TEST */
 
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incType := modules.GetStringFromMapInterface(mapIncoming, "type")
 		incTime := modules.GetStringFromMapInterface(mapIncoming, "time")
-
-		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
 
 		if strings.ToUpper(incType) != "REALTIME" && len(incTime) == 0 {
 			isTypeValid = false
@@ -53,16 +50,16 @@ func NewFormulaProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTrac
 			isTypeValid = true
 		}
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incType) > 0 && isTypeValid && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incType) > 0 && isTypeValid && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
 				//isSuccess, strFormulaID := saveToDatabase(db, incTraceCode, mapIncoming)
 				//isSuccess, strFormulaID := modules.SaveFormulaBillingIntoPg(db, incTraceCode, mapIncoming)
 				isSuccess := false
 				strFormulaID := ""
-				isSuccess, strFormulaID, statusDesc = modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming)
+				isSuccess, strFormulaID, statusDesc = modules.SaveFormulaArrayBillingIntoPg(db, incTraceCode, mapIncoming, incClientID)
 
 				if isSuccess {
 					modules.ReloadFormulaToRedis(db, rc, cx, strFormulaID)
@@ -97,6 +94,7 @@ func NewFormulaProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTrac
 	mapResponse["status"] = respStatus
 	mapResponse["description"] = statusDesc
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

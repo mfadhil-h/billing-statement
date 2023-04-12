@@ -175,6 +175,9 @@ func main() {
 
 		incURL := fmt.Sprintf("%s", r.URL)[1:]
 
+		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+			"incURL: "+fmt.Sprintf("%+v", incURL), false, nil)
+
 		if r.Body != nil && r.Method == "POST" {
 			bodyBytes, _ = ioutil.ReadAll(r.Body)
 

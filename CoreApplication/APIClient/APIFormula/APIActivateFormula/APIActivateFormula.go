@@ -14,12 +14,11 @@ const (
 	moduleName = "APIActivateFormula"
 )
 
-func saveToDatabase(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) bool {
+func saveToDatabase(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) bool {
 	const functionName = "saveToDatabase"
 	isSuccess := false
 	isActive := false
 
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	incStatus := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
@@ -81,18 +80,15 @@ func ActivateProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceC
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 		incStatus := modules.GetStringFromMapInterface(mapIncoming, "reqtype")
 
-		//isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 && len(incAccessToken) > 0 {
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incStatus) > 0 && len(incAccessToken) > 0 {
-
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
-				isSuccess := saveToDatabase(db, rc, cx, incTraceCode, mapIncoming)
+				isSuccess := saveToDatabase(db, rc, cx, incTraceCode, mapIncoming, incClientID)
 
 				if isSuccess {
 					respStatus = "000"
@@ -128,6 +124,7 @@ func ActivateProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceC
 	mapResponse["descripton"] = respDescription
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

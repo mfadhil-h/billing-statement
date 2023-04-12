@@ -202,17 +202,17 @@ func DoCheckRedisClientHit(rc *redis.Client, cx context.Context, incClient strin
 	return isValid
 }
 
-func DoCheckRedisCredential(rc *redis.Client, cx context.Context, incClientID string,
-	incUsername string, incAccessToken string, incRemoteIP string) bool {
+func DoCheckRedisCredential(rc *redis.Client, cx context.Context,
+	incUsername string, incAccessToken string, incRemoteIP string) (bool, string) {
 	isValid := false
-
-	redisKey := Config.ConstRedisAPIAccessToken + incClientID + incUsername
+	strClientID := ""
+	redisKey := Config.ConstRedisAPIAccessToken + incUsername
 	redisVal, errG := RedisGet(rc, cx, redisKey)
 	if errG == nil {
 		//isRemoteIPValid := false
 		mapRedisVal := ConvertJSONStringToMap("", redisVal)
 		//strUsername := GetStringFromMapInterface(mapRedisVal, "username")
-		//strClientID := GetStringFromMapInterface(mapRedisVal, "clientid")
+		strClientID = GetStringFromMapInterface(mapRedisVal, "clientid")
 		strAccessToken := GetStringFromMapInterface(mapRedisVal, "accesstoken")
 		strRemoteIP := GetStringFromMapInterface(mapRedisVal, "remoteip")
 		if strings.Contains(strRemoteIP, incRemoteIP) || strings.Contains(strRemoteIP, "ALL") {
@@ -238,14 +238,14 @@ func DoCheckRedisCredential(rc *redis.Client, cx context.Context, incClientID st
 		}
 	} else {
 		DoLog("ERROR", "", "APICredential", "createNewToken",
-			fmt.Sprintln("Failed get redis: ", incClientID+incUsername)+". Error occur.", true, errG)
+			fmt.Sprintln("Failed get redis: ", incUsername)+". Error occur.", true, errG)
 		//fmt.Println("Failed get Redis: ", strClientID+strUsername)
 		//isStatus = false
 		//status = "400"
 		//statusDesc = "Failed - Create refresh token"
 		isValid = false
 	}
-	return isValid
+	return isValid, strClientID
 
 	//isValid := false
 	//isIPALLValid := false

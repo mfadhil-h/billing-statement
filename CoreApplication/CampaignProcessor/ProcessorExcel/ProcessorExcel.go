@@ -124,7 +124,7 @@ func doProcessTheBatch(queueMessage string) {
 						strFormulaID := ""
 						if json.Valid([]byte(formulas)) {
 							/* SAVE FORMULA ONLY RETURN WITH FORMULA ID THEN MERGE WITH DATA VALUES */
-							isSuccess, strFormulaID, _ = modules.SaveFormulaArrayBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt)
+							isSuccess, strFormulaID, _ = modules.SaveFormulaArrayBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt, clientId)
 						} else {
 							/* SAVE FORMULA ONLY RETURN WITH FORMULA ID THEN MERGE WITH DATA VALUES */
 							isSuccess, strFormulaID = modules.SaveFormulaBillingIntoPg(dbPostgres, traceCode, mapFormulaAtt)
@@ -182,7 +182,7 @@ func doProcessTheBatch(queueMessage string) {
 						mapIncomingExcel["datas"] = mapRows
 
 						/* SAVING DATA IN THIS LINE AFTER LOOP */
-						modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, traceCode, mapIncomingExcel)
+						modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, traceCode, mapIncomingExcel, clientId)
 					}
 				}
 			}

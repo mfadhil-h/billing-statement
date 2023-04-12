@@ -14,11 +14,10 @@ const (
 	moduleName = "APIUpdateFormula"
 )
 
-func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}) bool {
+func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) bool {
 	const functionName = "saveToDatabase"
 	isSuccess := false
 
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	strFormula := ""
 	incFields := mapIncoming["fields"].(interface{})
@@ -92,17 +91,14 @@ func UpdateProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		//isCredentialValid := modules.DoCheckRedisClientHit(rc, cx, incClientID, incUsername, incPassword, incKey, incRemoteIPAddress)
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
-
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
-				isSuccess := saveToDatabase(db, incTraceCode, mapIncoming)
+				isSuccess := saveToDatabase(db, incTraceCode, mapIncoming, incClientID)
 
 				if isSuccess {
 					respDescription = "Formula successfully updated and will be running in the next 1 hour"
@@ -135,6 +131,7 @@ func UpdateProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	mapResponse["description"] = respDescription
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

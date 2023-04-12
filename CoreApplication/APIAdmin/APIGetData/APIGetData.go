@@ -16,14 +16,13 @@ const (
 	moduleName = "APIGetData"
 )
 
-func getAllFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) (string, string, []map[string]interface{}) {
+func getAllFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) (string, string, []map[string]interface{}) {
 	const functionName = "getAllFormulaDataFromMongo"
 	var mapReturns []map[string]interface{}
 	responseStatus := "000"
 	responseDesc := "Success"
 	//isSuccess := false
 
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	collectionName := incClientID + "_" + incFormulaID
 
@@ -152,18 +151,16 @@ func GetAllProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(redisClient, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(redisClient, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
-				mapDataResults["client_id"] = incClientID
 				mapDataResults["formula_id"] = incFormulaID
-				respStatus, statusDesc, mongoResults = getAllFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
-				_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+				respStatus, statusDesc, mongoResults = getAllFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming, incClientID)
+				_, _, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming, incClientID)
 				if len(mapFormula) > 0 {
 					mapDataResults["fields"] = mapFormula["fields"]
 					mapDataResults["formula_name"] = mapFormula["formula_name"]
@@ -245,13 +242,14 @@ func GetAllProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *red
 	mapResponse["description"] = statusDesc
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 
 	return incTraceCode, responseHeader, responseContent
 }
 
-func getOneFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}) (string, string, []map[string]interface{}) {
+func getOneFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, incTraceCode string, mapIncoming map[string]interface{}, incClientID string) (string, string, []map[string]interface{}) {
 	const functionName = "getOneFormulaDataFromMongo"
 	var mapReturns []map[string]interface{}
 	responseStatus := "000"
@@ -259,7 +257,6 @@ func getOneFormulaDataFromMongo(dbMongo *mongo.Database, cx context.Context, inc
 	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 		fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
-	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 	incDataID := modules.GetStringFromMapInterface(mapIncoming, "dataid")
 	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
@@ -314,19 +311,17 @@ func GetByIdProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 		incDataID := modules.GetStringFromMapInterface(mapIncoming, "dataid")
 
-		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incDataID) > 0 && len(incClientID) > 0 && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && len(incDataID) > 0 && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(redisClient, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(redisClient, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
-				mapDataResults["client_id"] = incClientID
 				mapDataResults["formula_id"] = incFormulaID
-				respStatus, statusDesc, mongoResults = getOneFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming)
-				_, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming)
+				respStatus, statusDesc, mongoResults = getOneFormulaDataFromMongo(dbMongo, cx, incTraceCode, mapIncoming, incClientID)
+				_, _, mapFormula := APIGetFormula.GetOneFormulaFromPostgres(dbPostgres, incTraceCode, mapIncoming, incClientID)
 				if len(mapFormula) > 0 {
 					mapDataResults["fields"] = mapFormula["fields"]
 					mapDataResults["formula_name"] = mapFormula["formula_name"]
@@ -409,6 +404,7 @@ func GetByIdProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, redisClient *re
 	mapResponse["description"] = statusDesc
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

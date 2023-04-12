@@ -118,6 +118,7 @@ func NewGroupProcess(db *sql.DB, redisClient *redis.Client, contextX context.Con
 	mapResponse["groupid"] = respClientID
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

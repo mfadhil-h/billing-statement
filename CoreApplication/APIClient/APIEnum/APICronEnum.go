@@ -82,11 +82,10 @@ func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, _ := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
 				respStatus, results = getEnumFromPostgres(db, incTraceCode, mapIncoming)
@@ -115,6 +114,7 @@ func GetAllProcess(db *sql.DB, rc *redis.Client, cx context.Context, incTraceCod
 	mapResponse["data"] = results
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

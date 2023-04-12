@@ -36,20 +36,19 @@ func SendDataProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Clie
 		modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 		/* TEMP REMOVE AUTH FOR TEST */
-		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
 		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incFormulaID := modules.GetStringFromMapInterface(mapIncoming, "formulaid")
 
 		isValid := modules.DoCheckFormulaID(rc, cx, incFormulaID)
 
-		if len(incUsername) > 0 && len(incClientID) > 0 && len(incFormulaID) > 0 && isValid && len(incAccessToken) > 0 {
+		if len(incUsername) > 0 && len(incFormulaID) > 0 && isValid && len(incAccessToken) > 0 {
 
-			isCredentialValid := modules.DoCheckRedisCredential(rc, cx, incClientID, incUsername, incAccessToken, incRemoteIPAddress)
+			isCredentialValid, incClientID := modules.DoCheckRedisCredential(rc, cx, incUsername, incAccessToken, incRemoteIPAddress)
 
 			if isCredentialValid {
 
-				isSuccess := modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, incTraceCode, mapIncoming)
+				isSuccess := modules.SaveDataBillingIntoMongo(dbMongo, rc, cx, incTraceCode, mapIncoming, incClientID)
 
 				if isSuccess {
 					respStatus = "000"
@@ -84,6 +83,7 @@ func SendDataProcess(dbPostgres *sql.DB, dbMongo *mongo.Database, rc *redis.Clie
 	mapResponse["description"] = respDescription
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

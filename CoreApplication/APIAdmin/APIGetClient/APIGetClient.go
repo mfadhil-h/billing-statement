@@ -146,6 +146,7 @@ func GetAllProcess(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 	mapResponse["data"] = results
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 
@@ -291,6 +292,7 @@ func GetByIdProcess(db *sql.DB, redisClient *redis.Client, contextX context.Cont
 	mapResponse["description"] = statusDesc
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 

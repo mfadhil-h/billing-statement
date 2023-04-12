@@ -108,6 +108,7 @@ func NewAPIUserProcess(db *sql.DB, redisClient *redis.Client, contextX context.C
 	mapResponse["key"] = respKey
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
+	mapResponse["tracecode"] = incTraceCode
 
 	responseContent = modules.ConvertMapInterfaceToJSON(mapResponse)
 
