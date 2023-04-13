@@ -70,6 +70,7 @@ func NewGroupProcess(db *sql.DB, redisClient *redis.Client, contextX context.Con
 
 	respStatus := "900"
 	respClientID := ""
+	statusDesc := ""
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
@@ -82,7 +83,7 @@ func NewGroupProcess(db *sql.DB, redisClient *redis.Client, contextX context.Con
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incName := modules.GetStringFromMapInterface(mapIncoming, "name")
 		incCountry := modules.GetStringFromMapInterface(mapIncoming, "country")
 		incCurrency := modules.GetStringFromMapInterface(mapIncoming, "currency")
@@ -90,31 +91,44 @@ func NewGroupProcess(db *sql.DB, redisClient *redis.Client, contextX context.Con
 		incPicEmail := modules.GetStringFromMapInterface(mapIncoming, "picemail")
 		incPicPhone := modules.GetStringFromMapInterface(mapIncoming, "picphone")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incName) > 0 &&
+		if len(incUsername) > 0 && len(incAccessToken) > 0 && len(incName) > 0 &&
 			len(incCountry) > 0 && len(incCurrency) > 0 && len(incPicName) > 0 &&
 			len(incPicEmail) > 0 && len(incPicPhone) > 0 {
 
-			isSuccess, strClientID := saveToDatabase(db, incTraceCode, mapIncoming)
+			isCredentialValid, _ := modules.DoCheckRedisCredential(redisClient, contextX, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				respStatus = "000"
-				respClientID = strClientID
+			if isCredentialValid {
+
+				isSuccess, strClientID := saveToDatabase(db, incTraceCode, mapIncoming)
+
+				if isSuccess {
+					respStatus = "000"
+					respClientID = strClientID
+				} else {
+					respStatus = "900"
+				}
 			} else {
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
 	responseHeader["Content-Type"] = "application/json"
 
+	mapResponse["description"] = statusDesc
 	mapResponse["groupid"] = respClientID
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime

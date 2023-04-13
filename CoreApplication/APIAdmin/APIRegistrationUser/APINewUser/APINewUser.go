@@ -19,14 +19,17 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 
 	incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 	incRemoteIP := modules.GetStringFromMapInterface(mapIncoming, "remoteip")
+	incUserAPIPassword := modules.GetStringFromMapInterface(mapIncoming, "userapipassword")
 
 	incUsername, incPassword, incKey := modules.GenerateAPICredential(incClientID)
+	if len(incUserAPIPassword) > 0 {
+		incPassword = incUserAPIPassword
+	}
 	incAPIID := modules.GenerateFormulaID(incClientID, incUsername)
 	incTimeNow := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
 
-	query := "INSERT INTO user_api (api_id, client_id, api_username, " +
-		"api_password, api_key, api_remote_ip_address, api_create_datetime, is_active) " +
-		"VALUES ($1,$2,$3,$4,$5,$6,$7,$8)"
+	query := `INSERT INTO user_api (api_id, client_id, api_username, api_password, api_key, api_remote_ip_address, 
+                      api_create_datetime, is_active) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`
 
 	result, err := db.Exec(query, incAPIID, incClientID, incUsername,
 		incPassword, incKey, incRemoteIP, incTimeNow, true)
@@ -57,11 +60,10 @@ func NewAPIUserProcess(db *sql.DB, redisClient *redis.Client, contextX context.C
 
 	responseHeader := make(map[string]string)
 	mapResponse := make(map[string]interface{})
+	result := make(map[string]interface{})
 
 	respStatus := "900"
-	respUsername := ""
-	respPassword := ""
-	respKey := ""
+	statusDesc := ""
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
@@ -74,38 +76,48 @@ func NewAPIUserProcess(db *sql.DB, redisClient *redis.Client, contextX context.C
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incClientID := modules.GetStringFromMapInterface(mapIncoming, "clientid")
 		incRemoteIP := modules.GetStringFromMapInterface(mapIncoming, "remoteip")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incClientID) > 0 && len(incRemoteIP) > 0 {
+		if len(incUsername) > 0 && len(incAccessToken) > 0 && len(incClientID) > 0 && len(incRemoteIP) > 0 {
 
-			isSuccess, strUsername, strPassword, strKey := saveToDatabase(db, incTraceCode, mapIncoming)
+			isCredentialValid, _ := modules.DoCheckRedisCredential(redisClient, contextX, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				respStatus = "000"
-				respUsername = strUsername
-				respPassword = strPassword
-				respKey = strKey
+			if isCredentialValid {
+
+				isSuccess, strUsername, strPassword, _ := saveToDatabase(db, incTraceCode, mapIncoming)
+
+				if isSuccess {
+					respStatus = "000"
+					result["username"] = strUsername
+					result["password"] = strPassword
+				} else {
+					respStatus = "900"
+				}
 			} else {
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
 	responseHeader["Content-Type"] = "application/json"
 
-	mapResponse["username"] = respUsername
-	mapResponse["password"] = respPassword
-	mapResponse["key"] = respKey
+	mapResponse["description"] = statusDesc
+	mapResponse["data"] = result
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
 	mapResponse["tracecode"] = incTraceCode

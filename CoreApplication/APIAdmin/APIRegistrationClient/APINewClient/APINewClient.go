@@ -32,14 +32,14 @@ func saveToDatabase(db *sql.DB, incTraceCode string, mapIncoming map[string]inte
 	incPicPhone := modules.GetStringFromMapInterface(mapIncoming, "picphone")
 
 	incClientID := modules.GenerateClientID(incName)
+	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
+		fmt.Sprintf("incClientID: %+v", incClientID), true, nil)
 	incTimeNow := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss.S", time.Now())
 
-	query := "INSERT INTO client (client_id, group_id, client_name, " +
-		"client_address, client_region, client_country, client_email, client_phone, client_currency, " +
-		"pic_name, pic_email, pic_phone, client_type, " +
-		"client_create_datetime, is_active) " +
-		"VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) " +
-		"ON CONFLICT (client_id) DO NOTHING"
+	query := `INSERT INTO client (client_id, group_id, client_name, client_address, client_region, client_country, 
+                    client_email, client_phone, client_currency, pic_name, pic_email, pic_phone, client_type, 
+                    client_create_datetime, is_active) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) 
+                                                       ON CONFLICT (client_id) DO NOTHING`
 
 	result, err := db.Exec(query, incClientID, incGroupID, incName,
 		incAddress, incRegion, incCountry, incEmail, incPhone, incCurrency,
@@ -73,9 +73,10 @@ func NewClientProcess(db *sql.DB, redisClient *redis.Client, contextX context.Co
 
 	responseHeader := make(map[string]string)
 	mapResponse := make(map[string]interface{})
+	result := make(map[string]interface{})
 
 	respStatus := "900"
-	respClientID := ""
+	statusDesc := ""
 	responseContent := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
@@ -88,7 +89,7 @@ func NewClientProcess(db *sql.DB, redisClient *redis.Client, contextX context.Co
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 		incGroupID := modules.GetStringFromMapInterface(mapIncoming, "groupid")
 		incName := modules.GetStringFromMapInterface(mapIncoming, "name")
 		incCountry := modules.GetStringFromMapInterface(mapIncoming, "country")
@@ -98,32 +99,45 @@ func NewClientProcess(db *sql.DB, redisClient *redis.Client, contextX context.Co
 		incPicEmail := modules.GetStringFromMapInterface(mapIncoming, "picemail")
 		incPicPhone := modules.GetStringFromMapInterface(mapIncoming, "picphone")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 && len(incGroupID) > 0 && len(incName) > 0 &&
+		if len(incUsername) > 0 && len(incAccessToken) > 0 && len(incGroupID) > 0 && len(incName) > 0 &&
 			len(incCountry) > 0 && len(incCurrency) > 0 && len(incType) > 0 && len(incPicName) > 0 &&
 			len(incPicEmail) > 0 && len(incPicPhone) > 0 {
 
-			isSuccess, strClientID := saveToDatabase(db, incTraceCode, mapIncoming)
+			isCredentialValid, _ := modules.DoCheckRedisCredential(redisClient, contextX, incUsername, incAccessToken, incRemoteIPAddress)
 
-			if isSuccess {
-				respStatus = "000"
-				respClientID = strClientID
+			if isCredentialValid {
+
+				isSuccess, strClientID := saveToDatabase(db, incTraceCode, mapIncoming)
+
+				if isSuccess {
+					respStatus = "000"
+					result["clientid"] = strClientID
+				} else {
+					respStatus = "900"
+				}
 			} else {
-				respStatus = "900"
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
 			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
 	responseHeader["Content-Type"] = "application/json"
 
-	mapResponse["clientid"] = respClientID
+	mapResponse["description"] = statusDesc
+	mapResponse["data"] = result
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
 	mapResponse["tracecode"] = incTraceCode

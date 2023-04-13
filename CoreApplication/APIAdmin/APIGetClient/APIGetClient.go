@@ -115,6 +115,7 @@ func GetAllProcess(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 
 	respStatus := "900"
 	responseContent := ""
+	statusDesc := ""
 	respDatetime := modules.DoFormatDateTime("YYYY-0M-0D HH:mm:ss", time.Now())
 
 	modules.DoLog("INFO", incTraceCode, moduleName, functionName,
@@ -126,23 +127,36 @@ func GetAllProcess(db *sql.DB, redisClient *redis.Client, contextX context.Conte
 			fmt.Sprintf("mapIncoming: %+v", mapIncoming), false, nil)
 
 		incUsername := modules.GetStringFromMapInterface(mapIncoming, "username")
-		incPassword := modules.GetStringFromMapInterface(mapIncoming, "password")
+		incAccessToken := modules.GetStringFromMapInterface(mapIncoming, "accesstoken")
 
-		if len(incUsername) > 0 && len(incPassword) > 0 {
-			respStatus, results = getAllClientFromPostgres(db, incTraceCode, mapIncoming)
+		if len(incUsername) > 0 && len(incAccessToken) > 0 {
+
+			isCredentialValid, _ := modules.DoCheckRedisCredential(redisClient, contextX, incUsername, incAccessToken, incRemoteIPAddress)
+
+			if isCredentialValid {
+				respStatus, results = getAllClientFromPostgres(db, incTraceCode, mapIncoming)
+			} else {
+				modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
+					"Request not valid", false, nil)
+				statusDesc = "Invalid Request - token is invalid"
+				respStatus = "103"
+			}
 		} else {
 			modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 				"Request not valid", false, nil)
+			statusDesc = "Invalid Request - invalid body request"
 			respStatus = "103"
 		}
 	} else {
 		modules.DoLog("ERROR", incTraceCode, moduleName, functionName,
 			"incomingMessage length == 0. INVALID REQUEST. trxStatus 206", false, nil)
+		statusDesc = "Invalid Request - no body request"
 		respStatus = "103"
 	}
 
 	responseHeader["Content-Type"] = "application/json"
 
+	mapResponse["description"] = statusDesc
 	mapResponse["data"] = results
 	mapResponse["status"] = respStatus
 	mapResponse["datetime"] = respDatetime
