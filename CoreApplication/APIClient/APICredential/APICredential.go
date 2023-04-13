@@ -30,7 +30,8 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 	status := "400"
 	statusDesc := "Failed"
 
-	query := `SELECT client_id, api_username, api_password, api_remote_ip_address, is_active FROM user_api WHERE api_username = $1;`
+	query := `SELECT ua.client_id, api_username, api_password, api_remote_ip_address, ua.is_active FROM user_api ua
+    			LEFT JOIN client c ON c.client_id = ua.client_id WHERE api_username = $1 AND c.client_type != 'ADMIN';`
 
 	rows, err := db.Query(query, incUsername)
 
