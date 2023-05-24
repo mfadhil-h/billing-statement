@@ -73,7 +73,7 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 
 							redisValAccessToken := modules.ConvertMapInterfaceToJSON(mapAccessToken)
 							fmt.Println(redisKeyAccess)
-							errA := modules.RedisSet(redisClient, goContext, redisKeyAccess, redisValAccessToken, 1*time.Hour)
+							errA := modules.RedisSet(redisClient, goContext, redisKeyAccess, redisValAccessToken, Config.ConstRedisExpiration)
 							if errA == nil {
 								//isStatus = true
 
@@ -88,7 +88,7 @@ func createNewToken(db *sql.DB, redisClient *redis.Client, goContext context.Con
 
 								redisValRefreshToken := modules.ConvertMapInterfaceToJSON(mapRefreshToken)
 								fmt.Println(redisKeyRefresh)
-								errR := modules.RedisSet(redisClient, goContext, redisKeyRefresh, redisValRefreshToken, 1*time.Hour)
+								errR := modules.RedisSet(redisClient, goContext, redisKeyRefresh, redisValRefreshToken, Config.ConstRedisExpiration)
 								if errR == nil {
 									fmt.Println("Success save Refresh: ", strUsername)
 									//isStatus = true
@@ -187,7 +187,7 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incTra
 
 				redisValAccessToken := modules.ConvertMapInterfaceToJSON(mapAccessToken)
 				fmt.Println(redisKeyAccess)
-				errA := modules.RedisSet(redisClient, goContext, redisKeyAccess, redisValAccessToken, 1*time.Hour)
+				errA := modules.RedisSet(redisClient, goContext, redisKeyAccess, redisValAccessToken, Config.ConstRedisExpiration)
 				if errA == nil {
 					//isStatus = true
 
@@ -202,7 +202,7 @@ func updateNewToken(redisClient *redis.Client, goContext context.Context, incTra
 
 					redisValRefreshToken := modules.ConvertMapInterfaceToJSON(mapRefreshToken)
 					fmt.Println(redisKeyRefresh)
-					errR := modules.RedisSet(redisClient, goContext, redisKeyRefresh, redisValRefreshToken, 1*time.Hour)
+					errR := modules.RedisSet(redisClient, goContext, redisKeyRefresh, redisValRefreshToken, Config.ConstRedisExpiration)
 					if errR == nil {
 						modules.DoLog("INFO", incTraceCode, moduleName, functionName,
 							fmt.Sprintln("Success save Refresh: ", strUsername)+". Error occur.", false, nil)
